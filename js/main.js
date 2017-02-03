@@ -86,7 +86,8 @@
 		}
 
 		addHistory(type, data, caption) {
-
+			return; // under construction
+			
 			while ((this.pointer < this.history.length-1) && this.history.length) {
 				console.debug("pop", this.history.pop().caption);
 			}
