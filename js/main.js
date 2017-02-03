@@ -4,7 +4,7 @@
 		canvasHeight: 32,
 		screenWidth: $(".canvas_wrapper").width(),
 		screenHeight: $(".canvas_wrapper").height(),
-		debug: true
+		debug: false
 	};
 
 	var canvasControllers = [];
