@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>pixelart editor</title>
+	<script src="js/jquery-3.1.1.min.js"></script>
+	<script src="js/main.js"></script>
+	<link rel="stylesheet" href="css/font-awesome.min.css">
+	<link rel="stylesheet" href="css/main.css">
+	<link rel="stylesheet" href="css/font.css"></head>
+</head>
+<body>
+	<div class="full_table">
+		<div class="full_cell">
+			<div class="canvas_wrapper">
+				<canvas id="canvas_main"></canvas>
+				<div class="cursor_normal">
+					<div class="distance_indicator left">
+						<div class="number_text"></div>
+					</div>
+					<div class="distance_indicator right">
+						<div class="number_text"></div>
+					</div>
+					<div class="distance_indicator top">
+						<div class="number_text"></div>
+					</div>
+					<div class="distance_indicator bottom">
+						<div class="number_text"></div>
+					</div>
+				</div>
+				<div class="cursor_select">
+					<canvas></canvas>
+				</div>
+			</div>
+		</div>
+		<div class="full_cell_right">
+			<div class="tools_wrapper">
+				<ul class="tools">
+					<li>
+						<input id="tool_pen" name="tools" type="radio" checked/>
+						<label for="tool_pen"><i class="icon-pencil"></i> ペン</label>
+					</li>
+					<li>
+						<input id="tool_eraser" name="tools" type="radio" />
+						<label for="tool_eraser"><i class="icon-eraser"></i> 透過ペン</label>
+					</li>
+					<li>
+						<input id="tool_dpen" name="tools" type="radio" />
+						<label for="tool_dpen"><i class="fa fa-eyedropper"></i> スポイトペン</label>
+					</li>
+					<li>
+						<input id="tool_fill" name="tools" type="radio" />
+						<label for="tool_fill"><i class="icon-bucket"></i> 塗りつぶし</label>
+					</li>
+					<li>
+						<input id="tool_selector" name="tools" type="radio" />
+						<label for="tool_selector"><i class="icon-copy"></i> 範囲コピー</label>
+					</li>
+				</ul>
+			</div>
+
+			<div class="color_manage_box">
+				<div class="color_selector">
+					<table>
+						<tr>
+							<td><input class="hue" type="range" min="0" max="360"/></td>
+							<td><input type="number" class="hue" name="" value="" min="0" max="360"></td>
+						</tr>
+						<tr>
+							<td><input class="saturation" type="range" min="0" max="100"/></td>
+							<td><input type="number" class="saturation" name="" value="" min="0" max="100"></td>
+						</tr>
+						<tr>
+							<td><input class="lightness" type="range" min="0" max="100"/></td>
+							<td><input type="number" class="lightness" name="" value="" min="0" max="100"></td>
+						</tr>
+					</table>
+				</div>
+				<div class="palette_wrapper">
+					<div id="palette_scroller_up" class="palette_scroller up"><i class="fa fa-caret-up"></i></div>
+					<ul class="palette"></ul>
+					<div id="palette_scroller_down" class="palette_scroller down"><i class="fa fa-caret-down"></i></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
