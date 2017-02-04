@@ -4,7 +4,7 @@
 		canvasHeight: 32,
 		screenWidth: $(".canvas_wrapper").width(),
 		screenHeight: $(".canvas_wrapper").height(),
-		debug: false
+		debug: true
 	};
 
 	var canvasControllers = [];
@@ -86,19 +86,15 @@
 		}
 
 		addHistory(type, data, caption) {
-			return; // under construction
-			
 			while ((this.pointer < this.history.length-1) && this.history.length) {
-				console.debug("pop", this.history.pop().caption);
+				this.history.pop();
 			}
 			this.history.push({
 				type: type,
-				data: data,
+				data: clone(data),
 				caption: caption
 			});
 			this.pointer++;
-
-			console.debug("addHistory", this.pointer, caption);
 		}
 
 		undo() {
@@ -111,8 +107,7 @@
 
 			if (p < 0) return undefined;
 
-			console.debug("undo", p, this.history[p].caption);
-			return this.history[p];
+			return clone(this.history[p]);
 		}
 
 		redo() {
@@ -124,8 +119,7 @@
 
 			if (p > this.history.length-1) return undefined;
 
-			console.debug("redo", p, this.history[p].caption);
-			return this.history[p];
+			return clone(this.history[p]);
 		}
 	}
 
@@ -763,33 +757,33 @@
 			this.canvasWrapper.on("mousedown", function(evt) {
 				if (!self.isActive()) return;
 				self.down = true;
-				self.mousedownAction(evt);
+				var pos = self.getRelativePos(evt);
+				self.mousedownAction(pos);
 			});
 
 			this.canvasWrapper.on("mouseup", function(evt) {
 				if (!self.isActive()) return;
 				self.down = false;
-				self.mouseupAction(evt);
+				var pos = self.getRelativePos(evt);
+				self.mouseupAction(pos);
 			});
 
 			this.canvasWrapper.on("mouseleave", function(evt) {
 				if (!self.isActive()) return;
 				self.down = false;
-				self.mouseleaveAction(evt);
+				var pos = self.getRelativePos(evt);
+				self.mouseleaveAction(pos);
 			});
 
 			this.canvasWrapper.on("mousemove", function(evt) {
 				if (!self.isActive()) return;
-				if (self.down) {
-					self.mousemoveAction(evt);
-				}
 
-				pos = s2c({
-					x: evt.originalEvent.offsetX,
-					y: evt.originalEvent.offsetY,
-					w: 0, h: 0
-				});
+				var pos = self.getRelativePos(evt);
 				if (pos.x == pos_old.x && pos.y == pos_old.y) return;
+
+				if (self.down) {
+					self.mousemoveAction(pos);
+				}
 
 				self.moveCursor(evt.originalEvent.offsetX, evt.originalEvent.offsetY);
 				pos_old = pos;
@@ -797,17 +791,28 @@
 
 			this.canvasWrapper.on("click", function(evt) {
 				if (!self.isActive()) return;
-				self.clickAction(evt);
+				var pos = self.getRelativePos(evt);
+				self.clickAction(pos);
 			});
 
 			$("body").on("click", function(evt) {
 				if (!self.isActive()) return;
-				self.globalClickAction(evt);
+				var pos = self.getRelativePos(evt);
+				self.globalClickAction(pos);
 			});
 		}
 
 		isActive() {
 			return this.button.is(":checked");
+		}
+
+		getRelativePos(evt) {
+			var target_rect = evt.currentTarget.getBoundingClientRect();
+			return s2c({
+				x: evt.clientX - target_rect.left,
+				y: evt.clientY - target_rect.top,
+				w: 0, h: 0
+			});
 		}
 
 		moveCursor(x, y) {
@@ -906,12 +911,12 @@
 			this.updateUI();
 		}
 
-		mousedownAction(evt) {}
-		mouseupAction(evt) {}
-		mouseleaveAction(evt) {}
-		mousemoveAction(evt) {}
-		clickAction(evt) {}
-		globalClickAction(evt) {}
+		mousedownAction(pos) {}
+		mouseupAction(pos) {}
+		mouseleaveAction(pos) {}
+		mousemoveAction(pos) {}
+		clickAction(pos) {}
+		globalClickAction(pos) {}
 	}
 
 	/* ======================================================================== */
@@ -920,23 +925,23 @@
 			super(button, canvas_wrapper, cursor_list);
 		}
 
-		penAction(evt) {
-			var rect = s2c({
-				x: evt.originalEvent.offsetX,
-				y: evt.originalEvent.offsetY,
-			});
+		penAction(pos) {
 			var canvas = canvasControllers[0];
-			canvas.dot(rect.x, rect.y);
+			canvas.dot(pos.x, pos.y);
 			canvas.render();
-			historyManager.addHistory("canvas", clone({ pixels: canvas.pixels, mask: canvas.mask }), "pen");
+			historyManager.addHistory("canvas", { pixels: canvas.pixels, mask: canvas.mask }, "pen");
 		}
 
-		mousemoveAction(evt) {
-			this.penAction(evt);
+		mousedownAction(pos) {
+			this.penAction(pos);
 		}
 
-		clickAction(evt) {
-			this.penAction(evt);
+		mousemoveAction(pos) {
+			this.penAction(pos);
+		}
+
+		clickAction(pos) {
+			this.penAction(pos);
 		}
 	}
 
@@ -946,15 +951,11 @@
 			super(button, canvas_wrapper, cursor_list);
 		}
 
-		penAction(evt) {
-			var rect = s2c({
-				x: evt.originalEvent.offsetX,
-				y: evt.originalEvent.offsetY,
-			});
+		penAction(pos) {
 			var canvas = canvasControllers[0];
-			canvas.del(rect.x, rect.y);
+			canvas.del(pos.x, pos.y);
 			canvas.render();
-			historyManager.addHistory("canvas", clone({ pixels: canvas.pixels, mask: canvas.mask }), "eraser");
+			historyManager.addHistory("canvas", { pixels: canvas.pixels, mask: canvas.mask }, "eraser");
 		}
 
 		updateUI() {
@@ -970,12 +971,16 @@
 			this.updateUI();
 		}
 
-		mousemoveAction(evt) {
-			this.penAction(evt);
+		mousedownAction(pos) {
+			this.penAction(pos);
 		}
 
-		clickAction(evt) {
-			this.penAction(evt);
+		mousemoveAction(pos) {
+			this.penAction(pos);
+		}
+
+		clickAction(pos) {
+			this.penAction(pos);
 		}
 	}
 
@@ -1004,44 +1009,36 @@
 			}
 		}
 
-		dropperAction(evt) {
+		dropperAction(pos) {
 			this.hasColor = true;
-			var rect = s2c({
-				x: evt.originalEvent.offsetX,
-				y: evt.originalEvent.offsetY,
-			});
 			var canvas = canvasControllers[0];
 			this.eraseMode = false;
-			if (!canvas.activateColorAt(rect.x, rect.y)) {
+			if (!canvas.activateColorAt(pos.x, pos.y)) {
 				this.eraseMode = true;
 			}
 			this.updateUI();
 		}
 
-		penAction(evt) {
-			var rect = s2c({
-				x: evt.originalEvent.offsetX,
-				y: evt.originalEvent.offsetY,
-			});
+		penAction(pos) {
 			var canvas = canvasControllers[0];
 			if (this.eraseMode) {
-				canvas.del(rect.x, rect.y);
+				canvas.del(pos.x, pos.y);
 			} else {
-				canvas.dot(rect.x, rect.y);
+				canvas.dot(pos.x, pos.y);
 			}
 			canvas.render();
-			historyManager.addHistory("canvas", clone({ pixels: canvas.pixels, mask: canvas.mask }), "dropper");
+			historyManager.addHistory("canvas", { pixels: canvas.pixels, mask: canvas.mask }, "dropper");
 
 			this.initializeCursorUI();
 			this.hasColor = false;
 		}
 
-		mousedownAction(evt) {
-			this.dropperAction(evt);
+		mousedownAction(pos) {
+			this.dropperAction(pos);
 		}
 
-		mouseupAction(evt) {
-			this.penAction(evt);
+		mouseupAction(pos) {
+			this.penAction(pos);
 		}
 	}
 
@@ -1051,19 +1048,15 @@
 			super(button, canvas_wrapper, cursor_list);
 		}
 
-		penAction(evt) {
-			var rect = s2c({
-				x: evt.originalEvent.offsetX,
-				y: evt.originalEvent.offsetY,
-			});
+		penAction(pos) {
 			var canvas = canvasControllers[0];
-			canvas.fill(rect.x, rect.y);
+			canvas.fill(pos.x, pos.y);
 			canvas.render();
-			historyManager.addHistory("canvas", clone({ pixels: canvas.pixels, mask: canvas.mask }), "fill");
+			historyManager.addHistory("canvas", { pixels: canvas.pixels, mask: canvas.mask }, "fill");
 		}
 
-		clickAction(evt) {
-			this.penAction(evt);
+		clickAction(pos) {
+			this.penAction(pos);
 		}
 	}
 
@@ -1281,11 +1274,10 @@
 			}
 			canvas.render();
 
-			historyManager.addHistory("canvas", clone({ pixels: canvas.pixels, mask: canvas.mask }), "selector");
+			historyManager.addHistory("canvas", { pixels: canvas.pixels, mask: canvas.mask }, "selector");
 		}
 
-		mousedownAction(evt) {
-			var pos = this.getRelativePos(evt);
+		mousedownAction(pos) {
 			switch(this.getMode()) {
 				case "moving":
 				this.movingCursorPos = pos;
@@ -1313,8 +1305,7 @@
 			this.updateUI();
 		}
 
-		mousemoveAction(evt) {
-			var pos = this.getRelativePos(evt);
+		mousemoveAction(pos) {
 			switch(this.getMode()) {
 				case "moving":
 				var left = Math.min(this.beginPos.x, this.endPos.x);
@@ -1344,7 +1335,7 @@
 			this.updateUI();
 		}
 
-		mouseupAction(evt) {
+		mouseupAction(pos) {
 			switch(this.getMode()) {
 				case "moving":
 				this.setMode("ready");
@@ -1353,7 +1344,7 @@
 
 				default:
 				this.setMode("ready");
-				this.setSelectedPoint("end", this.getRelativePos(evt), true);
+				this.setSelectedPoint("end", pos, true);
 				this.clipSelectedRect();
 				this.updateSelectCanvas();
 				break;
@@ -1361,7 +1352,7 @@
 			this.updateUI();
 		}
 
-		mouseleaveAction(evt) {
+		mouseleaveAction(pos) {
 			switch(this.getMode()) {
 				case "moving":
 				this.setMode("ready");
@@ -1369,7 +1360,6 @@
 
 				default:
 				this.setMode("ready");
-				//this.setSelectedPoint("end", this.getRelativePos(evt), true);
 				break;
 			}
 			this.updateUI();
@@ -1430,7 +1420,7 @@
 			$("#canvas_main")[0].getContext("2d"),
 			colorManager
 		));
-		historyManager.addHistory("canvas", clone({ pixels: canvasControllers[0].pixels, mask: canvasControllers[0].mask }), "init");
+		historyManager.addHistory("canvas", { pixels: canvasControllers[0].pixels, mask: canvasControllers[0].mask }, "init");
 
 		var cursor_list = {
 			normal: $(".cursor_normal"),
