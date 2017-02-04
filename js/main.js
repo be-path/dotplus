@@ -839,7 +839,7 @@
 					self.mousemoveAction(pos);
 				}
 
-				self.moveCursor(evt.originalEvent.offsetX, evt.originalEvent.offsetY);
+				self.moveCursor(pos.x, pos.y);
 				pos_old = pos;
 			});
 
@@ -870,10 +870,10 @@
 		}
 
 		moveCursor(x, y) {
-			var rect_canvas = s2c({
+			var rect_canvas = {
 				x: x, y: y,
-				w: env.dotWidth, h: env.dotHeight
-			});
+				w: 1, h: 1
+			};
 			var rect_screen = c2s(rect_canvas);
 
 			this.cursorNormal.css("left", rect_screen.x + "px");
@@ -1159,11 +1159,12 @@
 			}, function(evt) {
 				evt.stopPropagation();
 				if (self.getMode() != "select") {
-					var offset =  c2s({
+					var offset = {
 						x: Math.min(self.beginPos.x, self.endPos.x),
 						y: Math.min(self.beginPos.y, self.endPos.y)
-					});
-					self.moveCursor(evt.originalEvent.offsetX + offset.x, evt.originalEvent.offsetY + offset.y);
+					};
+					var pos = self.getRelativePos(evt);
+					self.moveCursor(pos.x + offset.x, pos.y + offset.y);
 					self.cursorNormal.show();
 				}
 			});
