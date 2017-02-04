@@ -1128,7 +1128,7 @@
 		}
 
 		clickAction(pos) {
-			tihs.canvasChanged = false;
+			this.canvasChanged = false;
 			this.penAction(pos);
 
 			if (this.canvasChanged) {
