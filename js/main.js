@@ -44,6 +44,7 @@
 	}
 
 	function hslaToString(color) {
+		if (!color) return "hsla(0, 0%, 0%, 0)";
 		var h = (color.h) ? (color.h) : 0;
 		var s = (color.s) ? (color.s) : 0;
 		var l = (color.l) ? (color.l) : 0;
@@ -466,22 +467,18 @@
 			}
 			this.colors[index].setParam(color.h, color.s, color.l, color.a);
 
-			var label = $("#color_"+this.getActiveColorIndex()+" + label");
+			var label = $("#color_"+index+" + label");
 			label.css("background-color", hslaToString(this.colors[index]));
 			label.removeClass("has_no_color");
 			this.updateUI();
 		}
 
 		getColor(index) {
-			var index_ = index;
-			if (index_ === undefined) {
-				index_ = this.getActiveColorIndex();
-			}
-			if (index_ < 0 || index_ > this.colorsIndexMax) return;
-			if (typeof(this.colors[index_]) !== "object") {
+			if (index < 0 || index > this.colorsIndexMax) return;
+			if (typeof(this.colors[index]) !== "object") {
 				return undefined;
 			}
-			return this.colors[index_];
+			return this.colors[index];
 		}
 
 		activateColor(index) {
@@ -502,7 +499,8 @@
 		constructor(context, colorManager) {
 			this.context = context;
 			this.colorManager = colorManager;
-			this.pixels = new Uint8Array(env.canvasWidth * env.canvasHeight);
+			//this.pixels = new Uint8Array(env.canvasWidth * env.canvasHeight);
+			this.pixels = [];
 			this.mask = [];
 
 			$(context.canvas).attr("width", env.screenWidth);
@@ -530,6 +528,7 @@
 		dot(x, y) {
 			var pos = y*env.canvasWidth + x;
 			var index = this.colorManager.getActiveColorIndex();
+			if (index < 0) return;
 
 			if (this.mask[pos] && (this.pixels[pos] == index)) {
 				return false;
@@ -566,6 +565,7 @@
 				{x: -1, y:  0}
 			];
 
+			if (index < 0) return;
 			if (source_mask && (source_index == fill_index)) {
 				return false;
 			}
@@ -678,36 +678,35 @@
 									h: color.h,
 									s: color.s,
 									l: (color.l > 50) ? 0 : 100,
-									a: 0.4
+									a: 0.2
 								});
 								ctx.arc(
 									screen_rect.x + env.dotWidth/2,
 									screen_rect.y + env.dotHeight/2,
-									env.dotWidth/4,
+									env.dotWidth/6,
 									0, Math.PI*2, false
 								);
 								ctx.fill();
 							}
 						}
+					}
 
-						// draw grid
-						if (i && j) {
-							ctx.lineWidth = 1;
-							ctx.beginPath();
-							ctx.fillStyle = hslaToString({
-								h: color.h,
-								s: color.s,
-								l: (color.l > 50 || !this.mask[pos]) ? 0 : 100,
-								a: 0.1
-							});
-							ctx.arc(
-								screen_rect.x - 0.5,
-								screen_rect.y - 0.5,
-								1,
-								0, Math.PI*2, false
-							);
-							ctx.fill();
-						}
+					// draw grid
+					if (i && j) {
+						ctx.beginPath();
+						ctx.fillStyle = hslaToString({
+							h: 0,
+							s: 0,
+							l: (color && color.l > 50) ? 0 : 100,
+							a: 0.2
+						});
+						ctx.arc(
+							screen_rect.x,
+							screen_rect.y,
+							1,
+							0, Math.PI*2, false
+						);
+						ctx.fill();
 					}
 				}
 			}
@@ -899,9 +898,12 @@
 			var indicator, color_text;
 			var pos = rect_canvas.y*env.canvasWidth + rect_canvas.x;
 			var color = canvas.colorManager.getColor(canvas.pixels[pos]);
+			if (!color) {
+				color = { h: 0, s: 0, l: 0, a: 1 };
+			}
 			color_text = hslaToString({
 				h: 0, s: 0,
-				l: (color.l > 50 || !canvas.mask[pos]) ? 0 : 100,
+				l: (!canvas.mask[pos] || color.l > 50) ? 0 : 100,
 				a: 1
 			});
 
@@ -1301,7 +1303,8 @@
 				height: height
 			};
 
-			this.clipPixels = new Uint8Array(width * height);
+			//this.clipPixels = new Uint8Array(width * height);
+			this.clipPixels = [];
 			this.clipMask = [];
 			var pos_src, pos_dst, x, y;
 			for (var j = height; j--; ) {
