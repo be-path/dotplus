@@ -697,7 +697,7 @@
 						ctx.fillStyle = hslaToString({
 							h: 0,
 							s: 0,
-							l: (color && color.l > 50) ? 0 : 100,
+							l: (!color || color.l > 50) ? 0 : 100,
 							a: 0.2
 						});
 						ctx.arc(
