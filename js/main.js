@@ -631,6 +631,7 @@
 					if ((pos_src >= rect.width*rect.height) || (pos_src < 0)) continue;
 
 					if (mask[pos_src]) {
+						if (!this.mask[pos_dst] || (this.pixels[pos_dst] != pixels[pos_src])) result = true;
 						this.pixels[pos_dst] = pixels[pos_src];
 						this.mask[pos_dst] = true;
 					}
@@ -1330,9 +1331,9 @@
 				width: Math.abs(this.beginPos.x - this.endPos.x) +1,
 				height: Math.abs(this.beginPos.y - this.endPos.y) +1
 			};
-			canvas.paste(rect, this.clipPixels, this.clipMask);
-
-			historyManager.addHistory("canvas", { pixels: canvas.pixels, mask: canvas.mask }, "selector");
+			if (canvas.paste(rect, this.clipPixels, this.clipMask)) {
+				historyManager.addHistory("canvas", { pixels: canvas.pixels, mask: canvas.mask }, "selector");
+			}
 		}
 
 		mousedownAction(pos) {
