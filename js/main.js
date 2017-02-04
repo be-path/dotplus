@@ -409,6 +409,7 @@
 			}
 
 			var index = this.getActiveColorIndex();
+			if (index < 0) return;
 			this.paletteUI.find("input[color_index="+index+"]").prop("checked", true);
 
 			var color = this.getColor(index);
@@ -464,6 +465,7 @@
 				this.colors[index] = new Color(0, 0, 0, 0);
 			}
 			this.colors[index].setParam(color.h, color.s, color.l, color.a);
+
 			var label = $("#color_"+this.getActiveColorIndex()+" + label");
 			label.css("background-color", hslaToString(this.colors[index]));
 			label.removeClass("has_no_color");
@@ -488,7 +490,10 @@
 		}
 
 		getActiveColorIndex() {
-			return this.activeIndex;
+			var index = this.activeIndex;
+			if (index < 0 || index > this.colorsIndexMax) return -1;
+			if (typeof(this.colors[index]) !== "object") return -1;
+			return index;
 		}
 	}
 
@@ -524,13 +529,26 @@
 
 		dot(x, y) {
 			var pos = y*env.canvasWidth + x;
-			this.pixels[pos] = this.colorManager.getActiveColorIndex();
+			var index = this.colorManager.getActiveColorIndex();
+
+			if (this.mask[pos] && (this.pixels[pos] == index)) {
+				return false;
+			}
+
+			this.pixels[pos] = index;
 			this.mask[pos] = true;
+
+			return true;
 		}
 
 		del(x, y) {
 			var pos = y*env.canvasWidth + x;
+
+			if (!this.mask[pos]) return false;
+
 			this.mask[pos] = false;
+
+			return true;
 		}
 
 		fill(x, y) {
@@ -547,6 +565,10 @@
 				{x:  1, y:  0},
 				{x: -1, y:  0}
 			];
+
+			if (source_mask && (source_index == fill_index)) {
+				return false;
+			}
 
 			flag[p] = true;
 			for (pos = queue.shift(); pos; pos = queue.shift()) {
@@ -586,6 +608,37 @@
 					}
 				}
 			}
+
+			return true;
+		}
+
+		paste(rect, pixels, mask) {
+			var result = false;
+			var pos_src, pos_dst, x, y;
+
+			for (var j = rect.height; j--; ) {
+				for (var i = rect.width; i--; ) {
+					x = rect.left + i;
+					y = rect.top + j;
+
+					if ((x >= env.canvasWidth) || (x < 0)) continue;
+					if ((y >= env.canvasHeight) || (y < 0)) continue;
+
+					pos_dst = y*env.canvasWidth + x;
+					pos_src = j*rect.width + i;
+
+					if ((pos_dst >= env.canvasWidth*env.canvasHeight) || (pos_dst < 0)) continue;
+					if ((pos_src >= rect.width*rect.height) || (pos_src < 0)) continue;
+
+					if (mask[pos_src]) {
+						this.pixels[pos_dst] = pixels[pos_src];
+						this.mask[pos_dst] = true;
+					}
+				}
+			}
+			this.render();
+
+			return result;
 		}
 
 		activateColorAt(x, y) {
@@ -923,16 +976,18 @@
 	class NormalPen extends Tool {
 		constructor(button, canvas_wrapper, cursor_list) {
 			super(button, canvas_wrapper, cursor_list);
+			this.canvasChanged = false;
 		}
 
 		penAction(pos) {
 			var canvas = canvasControllers[0];
-			canvas.dot(pos.x, pos.y);
+			var changed = canvas.dot(pos.x, pos.y);
+			if (changed) this.canvasChanged = true;
 			canvas.render();
-			historyManager.addHistory("canvas", { pixels: canvas.pixels, mask: canvas.mask }, "pen");
 		}
 
 		mousedownAction(pos) {
+			this.canvasChanged = false;
 			this.penAction(pos);
 		}
 
@@ -940,8 +995,11 @@
 			this.penAction(pos);
 		}
 
-		clickAction(pos) {
-			this.penAction(pos);
+		mouseupAction(pos) {
+			var canvas = canvasControllers[0];
+			if (this.canvasChanged) {
+				historyManager.addHistory("canvas", { pixels: canvas.pixels, mask: canvas.mask }, "pen");
+			}
 		}
 	}
 
@@ -949,13 +1007,14 @@
 	class Eraser extends Tool {
 		constructor(button, canvas_wrapper, cursor_list) {
 			super(button, canvas_wrapper, cursor_list);
+			this.canvasChanged = false;
 		}
 
 		penAction(pos) {
 			var canvas = canvasControllers[0];
-			canvas.del(pos.x, pos.y);
+			var changed = canvas.del(pos.x, pos.y);
+			if (changed) this.canvasChanged = true;
 			canvas.render();
-			historyManager.addHistory("canvas", { pixels: canvas.pixels, mask: canvas.mask }, "eraser");
 		}
 
 		updateUI() {
@@ -972,6 +1031,7 @@
 		}
 
 		mousedownAction(pos) {
+			this.canvasChanged = false;
 			this.penAction(pos);
 		}
 
@@ -979,8 +1039,11 @@
 			this.penAction(pos);
 		}
 
-		clickAction(pos) {
-			this.penAction(pos);
+		mouseupAction(pos) {
+			var canvas = canvasControllers[0];
+			if (this.canvasChanged) {
+				historyManager.addHistory("canvas", { pixels: canvas.pixels, mask: canvas.mask }, "eraser");
+			}
 		}
 	}
 
@@ -990,6 +1053,7 @@
 			super(button, canvas_wrapper, cursor_list);
 
 			this.eraseMode = false;
+			this.canvasChanged = false;
 		}
 
 		initializeCursorUI() {
@@ -1021,24 +1085,30 @@
 
 		penAction(pos) {
 			var canvas = canvasControllers[0];
+			var changed = false;
 			if (this.eraseMode) {
-				canvas.del(pos.x, pos.y);
+				changed = canvas.del(pos.x, pos.y);
 			} else {
-				canvas.dot(pos.x, pos.y);
+				changed = canvas.dot(pos.x, pos.y);
 			}
+			if (changed) this.canvasChanged = true;
 			canvas.render();
-			historyManager.addHistory("canvas", { pixels: canvas.pixels, mask: canvas.mask }, "dropper");
 
 			this.initializeCursorUI();
 			this.hasColor = false;
 		}
 
 		mousedownAction(pos) {
+			this.canvasChanged = false;
 			this.dropperAction(pos);
 		}
 
 		mouseupAction(pos) {
 			this.penAction(pos);
+			if (this.canvasChanged) {
+				var canvas = canvasControllers[0];
+				historyManager.addHistory("canvas", { pixels: canvas.pixels, mask: canvas.mask }, "dropper");
+			}
 		}
 	}
 
@@ -1046,17 +1116,24 @@
 	class FillPen extends Tool {
 		constructor(button, canvas_wrapper, cursor_list) {
 			super(button, canvas_wrapper, cursor_list);
+			this.canvasChanged = false;
 		}
 
 		penAction(pos) {
 			var canvas = canvasControllers[0];
-			canvas.fill(pos.x, pos.y);
+			var changed = canvas.fill(pos.x, pos.y);
+			if (changed) this.canvasChanged = true;
 			canvas.render();
-			historyManager.addHistory("canvas", { pixels: canvas.pixels, mask: canvas.mask }, "fill");
 		}
 
 		clickAction(pos) {
+			tihs.canvasChanged = false;
 			this.penAction(pos);
+
+			if (this.canvasChanged) {
+				var canvas = canvasControllers[0];
+				historyManager.addHistory("canvas", { pixels: canvas.pixels, mask: canvas.mask }, "fill");
+			}
 		}
 	}
 
@@ -1246,33 +1323,14 @@
 
 		pasteSelectedRect() {
 			var canvas = canvasControllers[0];
-			var left = Math.min(this.beginPos.x, this.endPos.x);
-			var top = Math.min(this.beginPos.y, this.endPos.y);
-			var width = Math.abs(this.beginPos.x - this.endPos.x) +1;
-			var height = Math.abs(this.beginPos.y - this.endPos.y) +1;
 
-			var pos_src, pos_dst, x, y;
-			for (var j = height; j--; ) {
-				for (var i = width; i--; ) {
-					x = left + i;
-					y = top + j;
-
-					if ((x >= env.canvasWidth) || (x < 0)) continue;
-					if ((y >= env.canvasHeight) || (y < 0)) continue;
-
-					pos_dst = y*env.canvasWidth + x;
-					pos_src = j*width + i;
-
-					if ((pos_dst >= env.canvasWidth*env.canvasHeight) || (pos_dst < 0)) continue;
-					if ((pos_src >= width*height) || (pos_src < 0)) continue;
-
-					if (this.clipMask[pos_src]) {
-						canvas.pixels[pos_dst] = this.clipPixels[pos_src];
-						canvas.mask[pos_dst] = true;
-					}
-				}
-			}
-			canvas.render();
+			var rect = {
+				left: Math.min(this.beginPos.x, this.endPos.x),
+				top: Math.min(this.beginPos.y, this.endPos.y),
+				width: Math.abs(this.beginPos.x - this.endPos.x) +1,
+				height: Math.abs(this.beginPos.y - this.endPos.y) +1
+			};
+			canvas.paste(rect, this.clipPixels, this.clipMask);
 
 			historyManager.addHistory("canvas", { pixels: canvas.pixels, mask: canvas.mask }, "selector");
 		}

@@ -276,6 +276,7 @@ input[type="number"]::-webkit-inner-spin-button {
 	height: 100%;
 	color: #fff;
 	font-size: 1vmin;
+	pointer-events: none;
 	transition-property: all;
 	transition-duration: 0.1s;
 	transition-timing-function: ease-out;
