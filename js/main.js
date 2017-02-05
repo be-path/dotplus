@@ -132,8 +132,8 @@
 			var self = this;
 			$(document).keydown(function(evt) {
 				self.keyEventHandler(evt);
-				evt.preventDefault();
-				return false;
+				// evt.preventDefault();
+				// return false;
 			});
 		}
 
