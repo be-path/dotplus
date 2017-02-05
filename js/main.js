@@ -137,13 +137,13 @@
 			});
 		}
 
-		keyToID(key_code, shift, ctrl, alt, meta) {
-			var result = key_code;
-
-			result += shift ? "_1" : "_0";
-			result += ctrl  ? "_1" : "_0";
-			result += alt   ? "_1" : "_0";
-			result += meta  ? "_1" : "_0";
+		keyToID(key) {
+			var result = "";
+			result += !isNaN(key.code) ? key.code : "?";
+			result += key.shift ? "_1" : "_0";
+			result += key.ctrl  ? "_1" : "_0";
+			result += key.alt   ? "_1" : "_0";
+			result += key.meta  ? "_1" : "_0";
 
 			return result;
 		}
@@ -151,11 +151,9 @@
 		/**
 		 * addShortcutKey
 		 *
-		 * @param key_code
-		 *   event.keyCode
-		 *
-		 * @param modifier
+		 * @param key
 		 *   {
+		 *     code: <int>,
 		 *     shift: <boolean>,
 		 *     ctrl:  <boolean>,
 		 *     alt:   <boolean>,
@@ -165,24 +163,29 @@
 		 * @param action
 		 *   callback function
 		 */
-		addShortcutKey(key_code, modifier, action) {
-			var shift, ctrl, alt, meta;
-
-			if (modifier) {
-				shift = modifier.shift ? true : false;
-				ctrl  = modifier.ctrl  ? true : false;
-				alt   = modifier.alt   ? true : false;
-				meta  = modifier.meta  ? true : false;
-			}
-
-			var key_id = this.keyToID(key_code, shift, ctrl, alt, meta);
-
+		addShortcutKey(key, action) {
+			var key_id = this.keyToID(key);
 			this.keyActionMap[key_id] = action;
 			return this;
 		}
 
+		addShortcutKeys(keys, action) {
+			var result = true;
+			for (var i = keys.length; i--; ) {
+				result = this.addShortcutKey(keys[i], action);
+				if (!result) return this;
+			}
+			return this;
+		}
+
 		keyEventHandler(evt) {
-			var key_id = this.keyToID(evt.keyCode, evt.shiftKey, evt.ctrlKey, evt.altKey, evt.metaKey);
+			var key_id = this.keyToID({
+				code: evt.keyCode,
+				shift: evt.shiftKey,
+				ctrl: evt.ctrlKey,
+				alt: evt.altKey,
+				meta: evt.metaKey
+			});
 			if (typeof(this.keyActionMap[key_id]) != "function") return;
 
 			this.keyActionMap[key_id]();
@@ -1465,6 +1468,7 @@
 
 	/* ======================================================================== */
 	$(document).ready(function() {
+		// env
 		refreshEnv();
 		var resize_timer;
 		$(window).resize(function() {
@@ -1479,12 +1483,16 @@
 
 		var colorManager = new ColorManager($(".palette_wrapper"), $(".color_selector"));
 
+		// canvas
 		canvasControllers.push(new CanvasController(
 			$("#canvas_main")[0].getContext("2d"),
 			colorManager
 		));
+
+		// history
 		historyManager.addHistory("canvas", { pixels: canvasControllers[0].pixels, mask: canvasControllers[0].mask }, "init");
 
+		// tools
 		var cursor_list = {
 			normal: $(".cursor_normal"),
 			select: $(".cursor_select")
@@ -1495,40 +1503,39 @@
 		new FillPen($("#tool_fill"), $(".canvas_wrapper"), cursor_list);
 		new Selector($("#tool_selector"), $(".canvas_wrapper"), cursor_list);
 
+		// shortcut key
 		var shortcutKeyManager = new ShortcutKeyManager();
-		shortcutKeyManager.addShortcutKey(
-			70, // f
-			undefined,
+		shortcutKeyManager.addShortcutKey( // Pen
+			{ code: 70 }, // f
 			function() {
 				$("#tool_pen").prop("checked", true).change();
 			}
-		).addShortcutKey(
-			68, // d
-			undefined,
+		).addShortcutKey( // Eraser
+			{ code: 68 }, // d
 			function() {
 				$("#tool_eraser").prop("checked", true).change();
 			}
-		).addShortcutKey(
-			83, // s
-			undefined,
+		).addShortcutKey( // Dropper
+			{ code: 83 }, // s
 			function() {
 				$("#tool_dpen").prop("checked", true).change();
 			}
-		).addShortcutKey(
-			65, // a
-			undefined,
+		).addShortcutKey( // Fill
+			{ code: 65 },
 			function() {
 				$("#tool_fill").prop("checked", true).change();
 			}
-		).addShortcutKey(
-			82, // r
-			undefined,
+		).addShortcutKey( // Select
+			{ code: 82 }, // r
 			function() {
 				$("#tool_selector").prop("checked", true).change();
 			}
-		).addShortcutKey(
-			90, // z
-			undefined,
+		).addShortcutKeys( // Undo
+			[
+				{ code: 90 }, // z
+				{ code: 90, ctrl: true }, // ctrl + z
+				{ code: 90, meta: true }, // meta + z
+			],
 			function() {
 				var history = historyManager.undo();
 				if (history) {
@@ -1537,9 +1544,12 @@
 					canvasControllers[0].render();
 				}
 			}
-		).addShortcutKey(
-			88, // x
-			undefined,
+		).addShortcutKeys( // Redo
+			[
+				{ code: 88 }, // x
+				{ code: 90, ctrl: true, shift: true }, // ctrl + shift + z
+				{ code: 90, meta: true, shift: true} // meta + shift + z
+			],
 			function() {
 				var history = historyManager.redo();
 				if (history) {
