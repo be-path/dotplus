@@ -1,10 +1,11 @@
 (function() {
 	var env = {
+		version: "0.1",
 		canvasWidth: 32,
 		canvasHeight: 32,
 		screenWidth: $(".canvas_wrapper").width(),
 		screenHeight: $(".canvas_wrapper").height(),
-		debug: true
+		debug: false
 	};
 
 	var canvasControllers = [];
@@ -70,13 +71,78 @@
 		try {
 			result = JSON.parse(window.localStorage.getItem(key));
 		} catch (e) {
-			return result;
+			return;
 		}
 		return result;
 	}
 
 	function clone(src) {
 		return $.extend(true, {}, src);
+	}
+
+	function load() {
+		// whole data
+		var load_data = loadJSON("dotplus");
+		if (!load_data) return;
+
+		var loaded_env = load_data.env;
+		var loaded_canvas = load_data.canvas;
+		var loaded_palette = load_data.palette;
+
+		// env
+		if (!loaded_env) return;
+		env = loaded_env;
+		refreshEnv();
+
+		// canvas
+		if (!loaded_canvas || loaded_canvas.length < 1 || canvasControllers.length < 1) return;
+		canvasControllers[0].pixels = loaded_canvas[0].pixels;
+		canvasControllers[0].mask = loaded_canvas[0].mask;
+		canvasControllers[0].render();
+
+		// palette
+		if (!loaded_palette) return;
+		canvasControllers[0].colorManager.colors = [];
+		var color;
+		for (var i = 0; i < loaded_palette[0].colors.length; i++) {
+			color = loaded_palette[0].colors[i];
+			if (!color) continue;
+			canvasControllers[0].colorManager.colors[i] = new Color(
+				color.h,
+				color.s,
+				color.l,
+				color.a
+			);
+		}
+		canvasControllers[0].colorManager.updatePaletteUI();
+	}
+
+	function save() {
+		var save_data = {};
+
+		// env
+		save_data.env = env;
+
+		// canvas
+		save_data.canvas = [];
+		for (var i = 0; i < canvasControllers.length; i++) {
+			save_data.canvas[i] = {
+				caption: "layer",
+				pixels: canvasControllers[i].pixels,
+				mask: canvasControllers[i].mask
+			};
+		}
+
+		save_data.palette = [];
+		var color;
+		if (canvasControllers[0]) {
+			save_data.palette[0] = {
+				caption: "palette",
+				colors: canvasControllers[0].colorManager.dumpColors()
+			};
+		}
+
+		saveJSON("dotplus", save_data);
 	}
 
 	/* ======================================================================== */
@@ -202,6 +268,10 @@
 			this.a = Math.min(1,   Math.max(0, a)); // Alpha      : 0-1
 		}
 
+		toString() {
+			return hslaToString(this);
+		}
+
 		setParam(h, s, l, a) {
 			if (h !== undefined) { this.h = Math.min(360, Math.max(0, h)); }
 			if (s !== undefined) { this.s = Math.min(100, Math.max(0, s)); }
@@ -264,17 +334,43 @@
 				l: this.lightnessUI.val(),
 				a: 1
 			});
+		}
 
-			if (env.debug) {
-				this.randomColor();
+		dumpColors() {
+			var result = [];
+			var color;
+			for (var i = 0; i < this.colors.length; i++) {
+				color = this.colors[i];
+				if (!color) continue;
+				result[i] = {
+					h: color.h,
+					s: color.s,
+					l: color.l,
+					a: color.a
+				};
 			}
+			return result;
+		}
+
+		updatePaletteUI() {
+			for (var i = this.colorsIndexMax; i--; ) {
+				var label = $("#color_"+i+" + label");
+				if (this.colors[i]) {
+					label.css("background-color", hslaToString(this.colors[i]));
+					label.removeClass("has_no_color");
+				} else {
+					label.css("background-color", "");
+					label.addClass("has_no_color");
+				}
+			}
+			this.updateActiveColorUI();
 		}
 
 		randomColor() {
 			var color = {};
-			for (var i = 256; i--; ) {
+			for (var i = this.colorsIndexMax; i--; ) {
 				color = {
-					h: Math.round(i/256*360),
+					h: Math.round(i/this.colorsIndexMax*360),
 					s: 50,
 					l: Math.round(Math.random()*50 + 25),
 					a: 1
@@ -287,7 +383,7 @@
 				label.css("background-color", hslaToString(this.colors[i]));
 				label.removeClass("has_no_color");
 			}
-			this.updateUI();
+			this.updateActiveColorUI();
 		}
 
 		addCanvasController(canvas_controller) {
@@ -298,7 +394,7 @@
 			// make color elements
 			var style = $("<style></style>");
 			var style_inner = "";
-			for (var i = 0; i < 256; i++) {
+			for (var i = 0; i < this.colorsIndexMax; i++) {
 				var cell = $("<li class='orderd_cell order_"+i+"'><input id='color_"+i+"' color_index="+i+" name='colors' type='radio' /><label for='color_"+i+"' color_index="+i+" class='has_no_color'></li>");
 				style_inner += ".order_"+i+" { left: "+25*(i%8)+"px; top: "+25*Math.floor(i/8)+"px; }\n";
 				this.paletteUI.append(cell);
@@ -313,7 +409,7 @@
 			this.paletteUI.find("input[name='colors']").on("change", function() {
 				self.activateColor($(this).attr("color_index"));
 
-				self.updateUI();
+				self.updateActiveColorUI();
 			});
 
 			// indicate hovered color
@@ -404,7 +500,7 @@
 			});
 		}
 
-		updateUI() {
+		updateActiveColorUI() {
 			for (var i = this.penCallbacks.length; i--; ) {
 				var callback = this.penCallbacks[i];
 				if (typeof(callback.func) == "function") {
@@ -473,20 +569,24 @@
 			var label = $("#color_"+index+" + label");
 			label.css("background-color", hslaToString(this.colors[index]));
 			label.removeClass("has_no_color");
-			this.updateUI();
+			this.updateActiveColorUI();
 		}
 
 		getColor(index) {
 			if (index < 0 || index > this.colorsIndexMax) return;
 			if (typeof(this.colors[index]) !== "object") {
-				return undefined;
+				return;
 			}
 			return this.colors[index];
 		}
 
+		getActiveColor() {
+			return this.getColor(this.getActiveColorIndex());
+		}
+
 		activateColor(index) {
 			this.activeIndex = index;
-			this.updateUI();
+			this.updateActiveColorUI();
 		}
 
 		getActiveColorIndex() {
@@ -961,7 +1061,7 @@
 
 		updateUI() {
 			if (!this.isActive()) return;
-			var color = canvasControllers[0].colorManager.getColor();
+			var color = canvasControllers[0].colorManager.getActiveColor();
 			this.cursorNormal.css("background-color", hslaToString(color));
 		}
 
@@ -1479,6 +1579,16 @@
 			resize_timer = setTimeout(refreshEnv, 100);
 		});
 
+		var save_timer;
+		$(window).on("keyup mouseup", function() {
+			if (save_timer) {
+				clearTimeout(save_timer);
+				save_timer = undefined;
+			}
+			save_timer = setTimeout(save, 1000);
+			return true;
+		});
+
 		historyManager = new HistoryManager();
 
 		var colorManager = new ColorManager($(".palette_wrapper"), $(".color_selector"));
@@ -1559,5 +1669,7 @@
 				}
 			}
 		);
+
+		load();
 	});
 })();

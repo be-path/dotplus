@@ -50,7 +50,7 @@ input[type="number"]::-webkit-inner-spin-button {
 	margin: auto;
 	box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
 	cursor: crosshair;
-	background-color: rgba(255, 255, 255, 0.6);
+	background-color: rgba(255, 255, 255, 0.2);
 	background-image: url("../img/bg.png");
 }
 .canvas_wrapper::before {
@@ -76,7 +76,7 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 .palette {
 	position: relative;
-	background-color: rgba(64, 64, 64, 0.1);
+	background-color: rgba(255, 255, 255, 0.2);
 	background-image: url('../img/bg.png');
 	width: 200px;
 	height: 200px;
@@ -109,11 +109,13 @@ input[type="number"]::-webkit-inner-spin-button {
 	height: 100%;
 	left: 0;
 	cursor: pointer;
-	background-color: rgba(240, 240, 240, 0.9);
 	box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0);
 	transition-property: all;
-	transition-duration: 0.2s;
+	transition-duration: 0.1s;
 	transition-timing-function: ease-out;
+}
+.palette li label.has_no_color {
+	box-shadow: 1px 1px 10px 0 rgba(0, 0, 0, 0.2);
 }
 .palette li label:hover {
 	border-radius: 1px;
