@@ -175,7 +175,7 @@ input[type="number"]::-webkit-inner-spin-button {
 	background: linear-gradient(to right, #f00 0%, #ff0 16%, #0f0 33%, #0ff 51%, #00f 67%, #f0f 85%, #f00 100%);
 }
 .color_selector input[type="number"] {
-	width: 100%;
+	width: 2.5rem;
 	margin-left: 2px;
 	border-radius: 10px;
 	padding: 2px 5px;
