@@ -768,29 +768,27 @@
 						x: i, y: j,
 						w: 1, h: 1
 					});
-					if (color) {
-						if (this.mask[pos]) {
-							// draw pixel
-							ctx.fillStyle = hslaToString(color);
-							ctx.fillRect(screen_rect.x, screen_rect.y, screen_rect.w, screen_rect.h);
+					if (color && this.mask[pos]) {
+						// draw pixel
+						ctx.fillStyle = hslaToString(color);
+						ctx.fillRect(screen_rect.x, screen_rect.y, screen_rect.w, screen_rect.h);
 
-							// draw hovered color indicator
-							if (this.colorManager.hoveredIndex == color_index) {
-								ctx.beginPath();
-								ctx.fillStyle = hslaToString({
-									h: color.h,
-									s: color.s,
-									l: (color.l > 50) ? 0 : 100,
-									a: 0.2
-								});
-								ctx.arc(
-									screen_rect.x + env.dotWidth/2,
-									screen_rect.y + env.dotHeight/2,
-									env.dotWidth/6,
-									0, Math.PI*2, false
-								);
-								ctx.fill();
-							}
+						// draw hovered color indicator
+						if (this.colorManager.hoveredIndex == color_index) {
+							ctx.beginPath();
+							ctx.fillStyle = hslaToString({
+								h: color.h,
+								s: color.s,
+								l: (color.l > 50) ? 0 : 100,
+								a: 0.2
+							});
+							ctx.arc(
+								screen_rect.x + env.dotWidth/2,
+								screen_rect.y + env.dotHeight/2,
+								env.dotWidth/6,
+								0, Math.PI*2, false
+							);
+							ctx.fill();
 						}
 					}
 
@@ -800,7 +798,7 @@
 						ctx.fillStyle = hslaToString({
 							h: 0,
 							s: 0,
-							l: (!color || color.l > 50) ? 0 : 100,
+							l: (!color || !this.mask[pos] || color.l > 50) ? 0 : 100,
 							a: 0.2
 						});
 						ctx.arc(
@@ -1599,6 +1597,8 @@
 			colorManager
 		));
 
+		load();
+
 		// history
 		historyManager.addHistory("canvas", { pixels: canvasControllers[0].pixels, mask: canvasControllers[0].mask }, "init");
 
@@ -1631,7 +1631,7 @@
 				$("#tool_dpen").prop("checked", true).change();
 			}
 		).addShortcutKey( // Fill
-			{ code: 65 },
+			{ code: 65 }, // a
 			function() {
 				$("#tool_fill").prop("checked", true).change();
 			}
@@ -1669,7 +1669,10 @@
 				}
 			}
 		);
+	});
 
-		load();
+	// disable contextmenu
+	$(document).on("contextmenu", function(evt) {
+		evt.preventDefault();
 	});
 })();
