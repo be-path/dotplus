@@ -33,52 +33,68 @@
 			</div>
 		</div>
 		<div class="full_cell_right">
-			<div class="tools_wrapper">
-				<ul class="tools">
-					<li>
-						<input id="tool_pen" name="tools" type="radio" checked/>
-						<label for="tool_pen"><i class="icon-pencil"></i> ペン</label>
-					</li>
-					<li>
-						<input id="tool_eraser" name="tools" type="radio" />
-						<label for="tool_eraser"><i class="icon-eraser"></i> 消しゴム</label>
-					</li>
-					<li>
-						<input id="tool_dpen" name="tools" type="radio" />
-						<label for="tool_dpen"><i class="fa fa-eyedropper"></i> スポイトペン</label>
-					</li>
-					<li>
-						<input id="tool_fill" name="tools" type="radio" />
-						<label for="tool_fill"><i class="icon-bucket"></i> 塗りつぶし</label>
-					</li>
-					<li>
-						<input id="tool_selector" name="tools" type="radio" />
-						<label for="tool_selector"><i class="icon-copy"></i> 範囲コピー</label>
-					</li>
+			<div class="main_toggle_button" targets="drawing_toolbox mainmenu_wrapper">
+				<i class="icon-dots-three-horizontal"></i>
+			</div>
+
+			<div class="mainmenu_wrapper" style="display: none;">
+				<ul class="mainmenu">
+					<li><i class="icon-block"></i> 新規作成</li>
+					<li><i class="icon-block"></i> 名前をつけて保存</li>
+					<li><i class="icon-block"></i> 開く</li>
+					<li><i class="icon-block"></i> インポート</li>
+					<li><i class="icon-block"></i> エクスポート</li>
 				</ul>
 			</div>
 
-			<div class="color_manage_box">
-				<div class="color_selector">
-					<table>
-						<tr>
-							<td><input class="hue" type="range" min="0" max="360"/></td>
-							<td><input type="number" class="hue" name="" value="" min="0" max="360"></td>
-						</tr>
-						<tr>
-							<td><input class="saturation" type="range" min="0" max="100"/></td>
-							<td><input type="number" class="saturation" name="" value="" min="0" max="100"></td>
-						</tr>
-						<tr>
-							<td><input class="lightness" type="range" min="0" max="100"/></td>
-							<td><input type="number" class="lightness" name="" value="" min="0" max="100"></td>
-						</tr>
-					</table>
+			<div class="drawing_toolbox">
+				<div class="tools_wrapper">
+					<ul class="tools">
+						<li>
+							<input id="tool_pen" name="tools" type="radio" checked/>
+							<label for="tool_pen"><i class="icon-pencil"></i></label>
+						</li>
+						<li>
+							<input id="tool_eraser" name="tools" type="radio" />
+							<label for="tool_eraser"><i class="icon-eraser"></i></label>
+						</li>
+						<li>
+							<input id="tool_dpen" name="tools" type="radio" />
+							<label for="tool_dpen"><i class="fa fa-eyedropper"></i></label>
+						</li>
+						<li>
+							<input id="tool_fill" name="tools" type="radio" />
+							<label for="tool_fill"><i class="icon-bucket"></i></label>
+						</li>
+						<li>
+							<input id="tool_selector" name="tools" type="radio" />
+							<label for="tool_selector"><i class="icon-copy"></i></label>
+						</li>
+					</ul>
 				</div>
-				<div class="palette_wrapper">
-					<div id="palette_scroller_up" class="palette_scroller up"><i class="fa fa-caret-up"></i></div>
-					<ul class="palette"></ul>
-					<div id="palette_scroller_down" class="palette_scroller down"><i class="fa fa-caret-down"></i></div>
+
+				<div class="color_manage_box">
+					<div class="color_selector">
+						<table>
+							<tr>
+								<td><input class="hue" type="range" min="0" max="360"/></td>
+								<td><input type="number" class="hue" name="" value="" min="0" max="360"></td>
+							</tr>
+							<tr>
+								<td><input class="saturation" type="range" min="0" max="100"/></td>
+								<td><input type="number" class="saturation" name="" value="" min="0" max="100"></td>
+							</tr>
+							<tr>
+								<td><input class="lightness" type="range" min="0" max="100"/></td>
+								<td><input type="number" class="lightness" name="" value="" min="0" max="100"></td>
+							</tr>
+						</table>
+					</div>
+					<div class="palette_ui">
+						<div id="palette_scroller_up" class="palette_scroller up"><i class="fa fa-caret-up"></i></div>
+						<ul class="palette"></ul>
+						<div id="palette_scroller_down" class="palette_scroller down"><i class="fa fa-caret-down"></i></div>
+					</div>
 				</div>
 			</div>
 		</div>

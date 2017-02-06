@@ -1589,7 +1589,7 @@
 
 		historyManager = new HistoryManager();
 
-		var colorManager = new ColorManager($(".palette_wrapper"), $(".color_selector"));
+		var colorManager = new ColorManager($(".palette_ui"), $(".color_selector"));
 
 		// canvas
 		canvasControllers.push(new CanvasController(
@@ -1669,6 +1669,32 @@
 				}
 			}
 		);
+
+		// UIs
+		$(".main_toggle_button").on("click", function() {
+			var targets = $(this).attr("targets").split(" ");
+			if (!targets || !targets.length) return;
+
+			var index = $(this).attr("index");
+			if (index === undefined) {
+				index = 0;
+			}
+
+			index++;
+			if ((index < 0) || (index >= targets.length)) {
+				index = 0;
+			}
+
+			for (var i = targets.length; i--; ) {
+				if (i == index) {
+					$("."+targets[i]).show();
+				} else {
+					$("."+targets[i]).hide();
+				}
+			}
+
+			$(this).attr("index", index);
+		});
 	});
 
 	// disable contextmenu
