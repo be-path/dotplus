@@ -134,7 +134,6 @@
 		}
 
 		save_data.palette = [];
-		var color;
 		if (canvasControllers[0]) {
 			save_data.palette[0] = {
 				caption: "palette",
@@ -152,16 +151,47 @@
 			this.pointer = -1;
 		}
 
-		addHistory(type, data, caption) {
+		takeHistory(caption) {
+			var data = {
+				pixels: canvasControllers[0].pixels,
+				mask: canvasControllers[0].mask,
+				palette: canvasControllers[0].colorManager.dumpColors()
+			};
+
 			while ((this.pointer < this.history.length-1) && this.history.length) {
 				this.history.pop();
 			}
 			this.history.push({
-				type: type,
 				data: clone(data),
 				caption: caption
 			});
 			this.pointer++;
+		}
+
+		update(history) {
+			if (!history) return;
+
+			canvasControllers[0].pixels = history.data.pixels;
+			canvasControllers[0].mask = history.data.mask;
+
+			var loaded_palette = history.data.palette;
+			if (!loaded_palette) return;
+
+			canvasControllers[0].colorManager.colors = [];
+			var color;
+			for (var i = 0; i < loaded_palette.length; i++) {
+				color = loaded_palette[i];
+				if (!color) continue;
+				canvasControllers[0].colorManager.colors[i] = new Color(
+					color.h,
+					color.s,
+					color.l,
+					color.a
+				);
+			}
+
+			canvasControllers[0].colorManager.updatePaletteUI();
+			canvasControllers[0].render();
 		}
 
 		undo() {
@@ -174,7 +204,8 @@
 
 			if (p < 0) return undefined;
 
-			return clone(this.history[p]);
+			var history = clone(this.history[p]);
+			this.update(history);
 		}
 
 		redo() {
@@ -186,7 +217,8 @@
 
 			if (p > this.history.length-1) return undefined;
 
-			return clone(this.history[p]);
+			var history = clone(this.history[p]);
+			this.update(history);
 		}
 	}
 
@@ -272,6 +304,15 @@
 			return hslaToString(this);
 		}
 
+		toJSON() {
+			return {
+				h: this.h,
+				s: this.s,
+				l: this.l,
+				a: this.a
+			};
+		}
+
 		setParam(h, s, l, a) {
 			if (h !== undefined) { this.h = Math.min(360, Math.max(0, h)); }
 			if (s !== undefined) { this.s = Math.min(100, Math.max(0, s)); }
@@ -342,12 +383,7 @@
 			for (var i = 0; i < this.colors.length; i++) {
 				color = this.colors[i];
 				if (!color) continue;
-				result[i] = {
-					h: color.h,
-					s: color.s,
-					l: color.l,
-					a: color.a
-				};
+				result[i] = color.toJSON();
 			}
 			return result;
 		}
@@ -491,6 +527,16 @@
 			hue_ui.on("input", setColor_);
 			saturation_ui.on("input", setColor_);
 			lightness_ui.on("input", setColor_);
+
+			hue_ui.on("change", function() {
+				historyManager.takeHistory("palette");
+			});
+			saturation_ui.on("change", function() {
+				historyManager.takeHistory("palette");
+			});
+			lightness_ui.on("change", function() {
+				historyManager.takeHistory("palette");
+			});
 		}
 
 		addPenCallback(func, caller) {
@@ -1102,7 +1148,7 @@
 		mouseupAction(pos) {
 			var canvas = canvasControllers[0];
 			if (this.canvasChanged) {
-				historyManager.addHistory("canvas", { pixels: canvas.pixels, mask: canvas.mask }, "pen");
+				historyManager.takeHistory("pen");
 			}
 		}
 	}
@@ -1146,7 +1192,7 @@
 		mouseupAction(pos) {
 			var canvas = canvasControllers[0];
 			if (this.canvasChanged) {
-				historyManager.addHistory("canvas", { pixels: canvas.pixels, mask: canvas.mask }, "eraser");
+				historyManager.takeHistory("eraser");
 			}
 		}
 	}
@@ -1211,7 +1257,7 @@
 			this.penAction(pos);
 			if (this.canvasChanged) {
 				var canvas = canvasControllers[0];
-				historyManager.addHistory("canvas", { pixels: canvas.pixels, mask: canvas.mask }, "dropper");
+				historyManager.takeHistory("dropper");
 			}
 		}
 	}
@@ -1236,7 +1282,7 @@
 
 			if (this.canvasChanged) {
 				var canvas = canvasControllers[0];
-				historyManager.addHistory("canvas", { pixels: canvas.pixels, mask: canvas.mask }, "fill");
+				historyManager.takeHistory("fill");
 			}
 		}
 	}
@@ -1437,7 +1483,7 @@
 				height: Math.abs(this.beginPos.y - this.endPos.y) +1
 			};
 			if (canvas.paste(rect, this.clipPixels, this.clipMask)) {
-				historyManager.addHistory("canvas", { pixels: canvas.pixels, mask: canvas.mask }, "selector");
+				historyManager.takeHistory("selector");
 			}
 		}
 
@@ -1600,7 +1646,7 @@
 		load();
 
 		// history
-		historyManager.addHistory("canvas", { pixels: canvasControllers[0].pixels, mask: canvasControllers[0].mask }, "init");
+		historyManager.takeHistory("init");
 
 		// tools
 		var cursor_list = {
@@ -1647,12 +1693,7 @@
 				{ code: 90, meta: true }, // meta + z
 			],
 			function() {
-				var history = historyManager.undo();
-				if (history) {
-					canvasControllers[0].pixels = history.data.pixels;
-					canvasControllers[0].mask = history.data.mask;
-					canvasControllers[0].render();
-				}
+				historyManager.undo();
 			}
 		).addShortcutKeys( // Redo
 			[
@@ -1661,12 +1702,7 @@
 				{ code: 90, meta: true, shift: true} // meta + shift + z
 			],
 			function() {
-				var history = historyManager.redo();
-				if (history) {
-					canvasControllers[0].pixels = history.data.pixels;
-					canvasControllers[0].mask = history.data.mask;
-					canvasControllers[0].render();
-				}
+				historyManager.redo();
 			}
 		);
 

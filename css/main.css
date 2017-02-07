@@ -6,8 +6,8 @@
 	box-sizing: border-box;
 }
 ::selection {
-  background-color: rgba(64, 64, 64, 0.8);
-  color: #fff;
+	background-color: rgba(64, 64, 64, 0.8);
+	color: #fff;
 }
 html, body {
 	width: 100%;
@@ -168,7 +168,7 @@ input[type="number"]::-webkit-inner-spin-button {
 	transition-timing-function: ease-out;
 }
 .color_selector input[type="range"]:hover {
-	box-shadow: inset 1px 1px 5px 0 rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(255, 255, 255, 0.2);
+	box-shadow: inset 1px 1px 5px 0 rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(255, 255, 255, 0.1);
 }
 .color_selector input[type="range"].hue {
 	background: linear-gradient(to right, #f00 0%, #ff0 16%, #0f0 33%, #0ff 51%, #00f 67%, #f0f 85%, #f00 100%);
