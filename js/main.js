@@ -144,6 +144,13 @@
 		saveJSON("dotplus", save_data);
 	}
 
+	function showDialog(selector) {
+		console.debug(selector);
+		$(".dialog").hide();
+		$(selector).show();
+		$(".overlay").fadeIn();
+	}
+
 	/* ======================================================================== */
 	class HistoryManager {
 		constructor() {
@@ -1731,6 +1738,27 @@
 
 			$(this).attr("index", index);
 		});
+
+		// dialogs
+		$(".overlay").on("click", function() {
+			$(this).fadeOut();
+		});
+		$("#mainmenu_createnew").on("click", function() {
+			showDialog("#dialog_createnew");
+		});
+		$("#mainmenu_saveas").on("click", function() {
+			showDialog("#dialog_saveas");
+		});
+		$("#mainmenu_open").on("click", function() {
+			showDialog("#dialog_open");
+		});
+		$("#mainmenu_inport").on("click", function() {
+			showDialog("#dialog_inport");
+		});
+		$("#mainmenu_export").on("click", function() {
+			showDialog("#dialog_export");
+		});
+
 	});
 
 	// disable contextmenu
