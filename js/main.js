@@ -44,6 +44,10 @@
 		return c2s(s2c(rect));
 	}
 
+	function get1DPos(x, y) {
+		return y*env.canvasWidth + x;
+	}
+
 	function hslaToString(color) {
 		if (!color) return "hsla(0, 0%, 0%, 0)";
 		var h = (color.h) ? (color.h) : 0;
@@ -682,7 +686,7 @@
 		}
 
 		dot(x, y) {
-			var pos = y*env.canvasWidth + x;
+			var pos = get1DPos(x, y);
 			var index = this.colorManager.getActiveColorIndex();
 			if (index < 0) return;
 
@@ -697,7 +701,7 @@
 		}
 
 		del(x, y) {
-			var pos = y*env.canvasWidth + x;
+			var pos = get1DPos(x, y);
 
 			if (!this.mask[pos]) return false;
 
@@ -709,7 +713,7 @@
 		fill(x, y) {
 			var index, mask, pos, x_, y_, p_;
 			var flag = [];
-			var p = y*env.canvasWidth + x;
+			var p = get1DPos(x, y);
 			var source_index = this.pixels[p];
 			var source_mask = this.mask[p] ? true : false;
 			var queue = [{x: x, y: y}];
@@ -728,7 +732,7 @@
 
 			flag[p] = true;
 			for (pos = queue.shift(); pos; pos = queue.shift()) {
-				p = pos.y*env.canvasWidth + pos.x;
+				p = get1DPos(pos.x, pos.y);
 
 				index = this.pixels[p];
 				mask = this.mask[p] ? true : false;
@@ -751,7 +755,7 @@
 				for (var i = ds.length; i--; ) {
 					x_ = pos.x + ds[i].x;
 					y_ = pos.y + ds[i].y;
-					p_ = y_*env.canvasWidth + x_;
+					p_ = get1DPos(x_, y_);
 					if (
 						x_ < env.canvasWidth &&
 						x_ >= 0 &&
@@ -780,7 +784,7 @@
 					if ((x >= env.canvasWidth) || (x < 0)) continue;
 					if ((y >= env.canvasHeight) || (y < 0)) continue;
 
-					pos_dst = y*env.canvasWidth + x;
+					pos_dst = get1DPos(x, y);
 					pos_src = j*rect.width + i;
 
 					if ((pos_dst >= env.canvasWidth*env.canvasHeight) || (pos_dst < 0)) continue;
@@ -799,7 +803,7 @@
 		}
 
 		activateColorAt(x, y) {
-			var pos = y*env.canvasWidth + x;
+			var pos = get1DPos(x, y);
 			if (!this.mask[pos]) return false;
 
 			var index = this.pixels[pos];
@@ -814,7 +818,7 @@
 			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 			for (var j = 0; j < env.canvasHeight; j++) {
 				for (var i = 0; i < env.canvasWidth; i++) {
-					var pos = j*env.canvasWidth + i;
+					var pos = get1DPos(i, j);
 					color_index = this.pixels[pos];
 					color = this.colorManager.getColor(color_index);
 					screen_rect = c2s({
@@ -874,7 +878,7 @@
 				bottom: 0
 			};
 
-			var pos = y*env.canvasWidth + x;
+			var pos = get1DPos(x, y);
 			var color = this.pixels[pos];
 			var mask = this.mask[pos];
 			var i, j, p;
@@ -882,7 +886,7 @@
 			// left
 			i = x;
 			while (i-- > 0) {
-				p = y*env.canvasWidth + i;
+				p = get1DPos(i, y);
 				if (mask) {
 					if (this.pixels[p] != color || this.mask[p] != mask) break;
 				} else {
@@ -894,7 +898,7 @@
 			// right
 			i = x;
 			while (i++ < env.canvasWidth-1) {
-				p = y*env.canvasWidth + i;
+				p = get1DPos(i, y);
 				if (mask) {
 					if (this.pixels[p] != color || this.mask[p] != mask) break;
 				} else {
@@ -906,7 +910,7 @@
 			// top
 			j = y;
 			while (j-- > 0) {
-				p = j*env.canvasWidth + x;
+				p = get1DPos(x, j);
 				if (mask) {
 					if (this.pixels[p] != color || this.mask[p] != mask) break;
 				} else {
@@ -918,7 +922,7 @@
 			// bottom
 			j = y;
 			while (j++ < env.canvasHeight-1) {
-				p = j*env.canvasWidth + x;
+				p = get1DPos(x, j);
 				if (mask) {
 					if (this.pixels[p] != color || this.mask[p] != mask) break;
 				} else {
@@ -1034,6 +1038,19 @@
 			this.cursorNormal.css("width", rect_screen.w + "px");
 			this.cursorNormal.css("height", rect_screen.h + "px");
 
+			var canvas = canvasControllers[0];
+			var pos = get1DPos(rect_canvas.x, rect_canvas.y);
+			var color = canvas.colorManager.getColor(canvas.pixels[pos]);
+			var darkback = false;
+			if (canvas.mask[pos] && color.l < 50) {
+				darkback = true;
+			}
+			if (darkback) {
+				this.cursorNormal.addClass("darkback");
+			} else {
+				this.cursorNormal.removeClass("darkback");
+			}
+
 			this.updateIndicator(rect_canvas);
 		}
 
@@ -1049,23 +1066,12 @@
 				w: 0, h: 0
 			});
 
-			var indicator, color_text;
-			var pos = rect_canvas.y*env.canvasWidth + rect_canvas.x;
-			var color = canvas.colorManager.getColor(canvas.pixels[pos]);
-			if (!color) {
-				color = { h: 0, s: 0, l: 0, a: 1 };
-			}
-			color_text = hslaToString({
-				h: 0, s: 0,
-				l: (!canvas.mask[pos] || color.l > 50) ? 0 : 100,
-				a: 1
-			});
+			var indicator;
 
 			// left
 			indicator = this.cursorNormal.find(".distance_indicator.left");
 			indicator.css("left", (- distance_screen_lt.x) + "px");
 			indicator.css("top", "0");
-			indicator.css("color", color_text);
 			indicator.find(".number_text").attr("value", distance_canvas.left);
 			if (distance_canvas.left > 0) {
 				indicator.show();
@@ -1077,7 +1083,6 @@
 			indicator = this.cursorNormal.find(".distance_indicator.top");
 			indicator.css("left", "0");
 			indicator.css("top", (- distance_screen_lt.y) + "px");
-			indicator.css("color", color_text);
 			indicator.find(".number_text").attr("value", distance_canvas.top);
 			if (distance_canvas.top > 0) {
 				indicator.show();
@@ -1089,7 +1094,6 @@
 			indicator = this.cursorNormal.find(".distance_indicator.right");
 			indicator.css("left", distance_screen_rb.x + "px");
 			indicator.css("top", "0");
-			indicator.css("color", color_text);
 			indicator.find(".number_text").attr("value", distance_canvas.right);
 			if (distance_canvas.right > 0) {
 				indicator.show();
@@ -1101,7 +1105,6 @@
 			indicator = this.cursorNormal.find(".distance_indicator.bottom");
 			indicator.css("left", "0");
 			indicator.css("top", distance_screen_rb.y + "px");
-			indicator.css("color", color_text);
 			indicator.find(".number_text").attr("value", distance_canvas.bottom);
 			if (distance_canvas.bottom > 0) {
 				indicator.show();
@@ -1469,7 +1472,7 @@
 					if ((y >= env.canvasHeight) || (y < 0)) continue;
 
 					pos_dst = j*width + i;
-					pos_src = y*env.canvasWidth + x;
+					pos_src = get1DPos(x, y);
 
 					if ((pos_dst >= width*height) || (pos_dst < 0)) continue;
 					if ((pos_src >= env.canvasWidth*env.canvasHeight) || (pos_src < 0)) continue;
