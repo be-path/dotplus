@@ -1,6 +1,10 @@
 (function() {
+	var sys = {
+		appname: "dotplus",
+		version: "0.1"
+	};
+
 	var env = {
-		version: "0.1",
 		canvasWidth: 32,
 		canvasHeight: 32,
 		screenWidth: $(".canvas_wrapper").width(),
@@ -84,9 +88,37 @@
 		return $.extend(true, {}, src);
 	}
 
-	function load() {
-		// whole data
-		var load_data = loadJSON("dotplus");
+	function loadSystem() {
+		var load_key = sys.appname+".system";
+		var load_data = loadJSON(load_key);
+		if (!load_data) return;
+
+		var loaded_filename = load_data.filename;
+
+		if (loaded_filename === undefined || loaded_filename === "") return;
+
+		$("#main_filename").val(loaded_filename);
+
+		return true;
+	}
+
+	function saveSystem() {
+		var save_key = sys.appname+".system";
+		var save_data = {};
+
+		save_data.filename = $("#main_filename").val();
+		save_data.sysinfo = sys;
+
+		saveJSON(save_key, save_data);
+
+		return true;
+	}
+
+	function loadFile(name) {
+		if ((name === undefined) || (name === "")) return false;
+
+		var load_key = sys.appname+".files."+name;
+		var load_data = loadJSON(load_key);
 		if (!load_data) return;
 
 		var loaded_env = load_data.env;
@@ -97,6 +129,7 @@
 		if (!loaded_env) return;
 		env = loaded_env;
 		refreshEnv();
+		$("#main_filetimestamp").html(env.timestamp);
 
 		// canvas
 		if (!loaded_canvas || loaded_canvas.length < 1 || canvasControllers.length < 1) return;
@@ -119,12 +152,26 @@
 			);
 		}
 		canvasControllers[0].colorManager.updatePaletteUI();
+
+		return true;
 	}
 
-	function save() {
+	var saved_revision = 0;
+	function saveFile(name, rewrite) {
+		if ((name === undefined) || (name === "")) return false;
+		if (!historyManager.hasAnyChangeFrom(saved_revision)) return false;
+
+		var save_key = sys.appname+".files."+name;
+		if (!rewrite && loadFile(save_key)) {
+			// file exists
+			return false;
+		}
 		var save_data = {};
 
 		// env
+		env.timestamp = getTimestamp();
+		env.filename = name;
+		$("#main_filetimestamp").html(env.timestamp).addClass("saved");
 		save_data.env = env;
 
 		// canvas
@@ -145,7 +192,21 @@
 			};
 		}
 
-		saveJSON("dotplus", save_data);
+		saveJSON(save_key, save_data);
+		saved_revision = historyManager.counter;
+
+		return true;
+	}
+
+	function getAvailableFilename() {
+		var f = function() {
+			return "img_" + zeroPadding(Math.round(Math.random() * 0xffffff).toString(16), 6);
+		};
+		var result = f();
+		while (loadFile(result)) {
+			result = f();
+		}
+		return result;
 	}
 
 	function showDialog(selector) {
@@ -155,11 +216,40 @@
 		$(".overlay").fadeIn();
 	}
 
+	function getTimestamp() {
+		var now = new Date();
+
+		return (
+			[
+				zeroPadding(now.getFullYear(), 4), "-",
+				zeroPadding(now.getMonth(), 2), "-",
+				zeroPadding(now.getDate(), 2), " ",
+				zeroPadding(now.getHours(), 2), ":",
+				zeroPadding(now.getMinutes(), 2), ":",
+				zeroPadding(now.getSeconds(), 2)
+			].join("")
+		);
+	}
+
+	function zeroPadding(num, digit) {
+		if (digit < 1) return;
+		var zero_str = "";
+		for (var i = digit; i--; ) {
+			zero_str += "0";
+		}
+		return (zero_str + num).slice(-digit);
+	}
+
 	/* ======================================================================== */
 	class HistoryManager {
 		constructor() {
 			this.history = [];
 			this.pointer = -1;
+			this.counter = 0;
+		}
+
+		hasAnyChangeFrom(counter) {
+			return (counter !== this.counter);
 		}
 
 		takeHistory(caption) {
@@ -177,6 +267,8 @@
 				caption: caption
 			});
 			this.pointer++;
+			this.counter++;
+			$("#main_filetimestamp").removeClass("saved");
 		}
 
 		update(history) {
@@ -203,6 +295,8 @@
 
 			canvasControllers[0].colorManager.updatePaletteUI();
 			canvasControllers[0].render();
+			this.counter++;
+			$("#main_filetimestamp").removeClass("saved");
 		}
 
 		undo() {
@@ -288,6 +382,8 @@
 		}
 
 		keyEventHandler(evt) {
+			if ($("#main_filename:focus").length) return;
+
 			var key_id = this.keyToID({
 				code: evt.keyCode,
 				shift: evt.shiftKey,
@@ -1633,13 +1729,24 @@
 			resize_timer = setTimeout(refreshEnv, 100);
 		});
 
+		var main_filename = $("#main_filename");
+
 		var save_timer;
 		$(window).on("keyup mouseup", function() {
+			// does not need to save
+			if (historyManager.history.length <= 1) return;
+
 			if (save_timer) {
 				clearTimeout(save_timer);
 				save_timer = undefined;
 			}
-			save_timer = setTimeout(save, 1000);
+			save_timer = setTimeout(function() {
+				// changing filename
+				if ($("#main_filename:focus").length) return;
+
+				saveFile(main_filename.val());
+				saveSystem();
+			}, 1000);
 			return true;
 		});
 
@@ -1653,7 +1760,8 @@
 			colorManager
 		));
 
-		load();
+		loadSystem();
+		loadFile(main_filename.val());
 
 		// history
 		historyManager.takeHistory("init");
@@ -1717,6 +1825,23 @@
 		);
 
 		// UIs
+		if (main_filename.val() === "") {
+			main_filename.val(getAvailableFilename());
+		}
+		main_filename.on("keydown", function(evt) {
+			if (evt.originalEvent.keyCode == 13) {
+				// Enter
+				$(this).blur();
+			}
+		});
+		main_filename.on("blur", function() {
+			if (env.filename !== main_filename.val()) {
+				historyManager.counter++;
+			}
+			saveFile(main_filename.val());
+			saveSystem();
+		});
+
 		$(".main_toggle_button").on("click", function() {
 			var targets = $(this).attr("targets").split(" ");
 			if (!targets || !targets.length) return;
@@ -1746,22 +1871,21 @@
 		$(".overlay").on("click", function() {
 			$(this).fadeOut();
 		});
-		$("#mainmenu_createnew").on("click", function() {
-			showDialog("#dialog_createnew");
+		$(".dialog").on("click", function() {
+			return false;
 		});
-		$("#mainmenu_saveas").on("click", function() {
-			showDialog("#dialog_saveas");
-		});
-		$("#mainmenu_open").on("click", function() {
-			showDialog("#dialog_open");
-		});
-		$("#mainmenu_inport").on("click", function() {
-			showDialog("#dialog_inport");
-		});
-		$("#mainmenu_export").on("click", function() {
-			showDialog("#dialog_export");
-		});
-
+		// $("#mainmenu_createnew").on("click", function() {
+		// 	showDialog("#dialog_createnew");
+		// });
+		// $("#mainmenu_open").on("click", function() {
+		// 	showDialog("#dialog_open");
+		// });
+		// $("#mainmenu_inport").on("click", function() {
+		// 	showDialog("#dialog_inport");
+		// });
+		// $("#mainmenu_export").on("click", function() {
+		// 	showDialog("#dialog_export");
+		// });
 	});
 
 	// disable contextmenu

@@ -20,14 +20,6 @@
 						xxx
 					</div>
 				</div>
-				<div id="dialog_saveas" class="dialog">
-					<div class="dialog_title">
-						名前をつけて保存
-					</div>
-					<div class="dialog_content">
-						xxx
-					</div>
-				</div>
 				<div id="dialog_open" class="dialog">
 					<div class="dialog_title">
 						開く
@@ -80,17 +72,45 @@
 			</div>
 		</div>
 		<div class="full_cell_right">
-			<div class="main_toggle_button" targets="drawing_toolbox mainmenu_wrapper">
-				<i class="icon-dots-three-horizontal"></i>
+			<div class="main_filename_wrapper">
+				<label for="main_filename" class="main_filename_icon"><i class="fa fa-file"></i></label>
+				<input type="text" id="main_filename" name="main_filename" value="">
+				<label id="main_filetimestamp" for="main_filename" class="main_filetimestamp"></label>
 			</div>
+
+			<button class="main_toggle_button" targets="drawing_toolbox mainmenu_wrapper">
+				<i class="icon-dots-three-horizontal"></i>
+			</button>
 
 			<div class="mainmenu_wrapper" style="display: none;">
 				<ul class="mainmenu">
-					<li id="mainmenu_createnew"><i class="icon-block"></i> 新規作成</li>
-					<li id="mainmenu_saveas"><i class="icon-block"></i> 名前をつけて保存</li>
-					<li id="mainmenu_open"><i class="icon-block"></i> 開く</li>
-					<li id="mainmenu_inport"><i class="icon-block"></i> インポート</li>
-					<li id="mainmenu_export"><i class="icon-block"></i> エクスポート</li>
+					<li>
+						<input id="mainmenu_createnew" name="mainmenu_list" type="radio">
+						<label for="mainmenu_createnew"><i class="icon-block"></i> 新規作成</label>
+						<div class="foldmenu">
+							xxx
+						</div>
+					<li>
+						<input id="mainmenu_finder" name="mainmenu_list" type="radio">
+						<label for="mainmenu_finder"><i class="icon-block"></i> ファイル一覧</label>
+						<div class="foldmenu">
+							xxx
+						</div>
+					</li>
+					<li>
+						<input id="mainmenu_inport" name="mainmenu_list" type="radio">
+						<label for="mainmenu_inport"><i class="icon-block"></i> インポート</label>
+						<div class="foldmenu">
+							xxx
+						</div>
+					</li>
+					<li>
+						<input id="mainmenu_export" name="mainmenu_list" type="radio">
+						<label for="mainmenu_export"><i class="icon-block"></i> エクスポート</label>
+						<div class="foldmenu">
+							xxx
+						</div>
+					</li>
 				</ul>
 			</div>
 

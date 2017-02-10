@@ -18,6 +18,12 @@ html, body {
 ul {
 	list-style: none;
 }
+input, button, textarea {
+	outline: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+}
 input[type="number"] {
 	-moz-appearance: textfield;
 }
@@ -179,11 +185,7 @@ input[type="number"]::-webkit-inner-spin-button {
 .color_selector input[type="range"] {
 	display: block;
 	margin: 5px 0;
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	appearance: none;
 	border-radius: 10px;
-	outline: none;
 	width: 100%;
 	box-shadow: inset 1px 1px 5px 0 hsla(0, 0%, 0%, 0.4), 0 0 0 0 hsla(0, 0%, 100%, 0.2);
 	transition-property: all;
@@ -207,7 +209,6 @@ input[type="number"]::-webkit-inner-spin-button {
 	font-size: 1rem;
 	font-family: monospace;
 	text-shadow: 1px 1px 4px hsla(0, 0%, 0%, 0.2);
-	outline: none;
 	text-align: right;
 	transition-property: all;
 	transition-duration: 0.2s;
@@ -272,7 +273,61 @@ input[type="number"]::-webkit-inner-spin-button {
 	display: none;
 }
 
+.main_filename_wrapper {
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-wrap: wrap;
+	flex-wrap: wrap;
+	margin: 0 0 auto auto;
+	padding: 10px;
+	width: 200px;
+	color: #666;
+	background-color: hsla(0, 0%, 90%, 0.7);
+	box-shadow: 0 0 10px 0 hsla(0, 0%, 0%, 0.2);
+	text-shadow: 1px 1px 4px hsla(0, 0%, 0%, 0.2);
+	font-size: 0;
+	text-align: center;
+	transition-property: all;
+	transition-duration: 0.2s;
+	transition-timing-function: ease-out;
+}
+.main_filename_wrapper:hover {
+	background-color: hsla(0, 0%, 90%, 0.9);
+}
+.main_filename_wrapper input[name="main_filename"] {
+	display: inline-block;
+	box-sizing: border-box;
+	padding: 2px;
+	width: calc(100% - 2rem);
+	background-color: transparent;
+	color: #666;
+	text-shadow: 1px 1px 4px hsla(0, 0%, 0%, 0.2);
+	font-size: 1.2rem;
+}
+.main_filename_icon {
+	width: 2rem;
+	display: inline-block;
+	padding: 2px 0 2px 2px;
+	font-size: 1.2rem;
+}
+.main_filetimestamp {
+	width: 100%;
+	display: block;
+	padding: 2px;
+	font-size: 0.6rem;
+	text-align: right;
+}
+.main_filetimestamp::before {
+	font-family: FontAwesome;
+	content: "";
+	padding: 0 5px;
+}
+.main_filetimestamp.saved::before {
+	content: "\f058";
+}
+
 .main_toggle_button {
+	display: block;
 	margin: 0 0 auto auto;
 	width: 200px;
 	padding: 10px 20px;
@@ -305,7 +360,10 @@ input[type="number"]::-webkit-inner-spin-button {
 	box-shadow: 0 0 10px 0 hsla(0, 0%, 0%, 0.2);
 	font-size: 0;
 }
-.mainmenu li {
+.mainmenu input[type="radio"] {
+	display: none;
+}
+.mainmenu label {
 	display: block;
 	padding: 10px 20px;
 	cursor: pointer;
@@ -318,8 +376,19 @@ input[type="number"]::-webkit-inner-spin-button {
 	transition-duration: 0.2s;
 	transition-timing-function: ease-out;
 }
-.mainmenu li:hover {
+.mainmenu label:hover {
 	background-color: hsla(0, 0%, 25%, 0.6);
+}
+.mainmenu input[type="radio"]:checked + label {
+	box-shadow: inset 0 0 0 2px #9cc;
+	background-color: hsla(0, 0%, 25%, 0.7);
+}
+.mainmenu .foldmenu {
+	display: none;
+	font-size: 1rem;
+}
+.mainmenu input[type="radio"]:checked ~ .foldmenu {
+	display: block;
 }
 
 .cursor_normal {
