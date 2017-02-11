@@ -84,29 +84,31 @@
 
 			<div class="mainmenu_wrapper" style="display: none;">
 				<ul class="mainmenu">
-					<li>
-						<input id="mainmenu_createnew" name="mainmenu_list" type="radio">
-						<label for="mainmenu_createnew"><i class="icon-block"></i> 新規作成</label>
+					<li id="mainmenu_createnew">
+						<input id="createnew_caption" name="mainmenu_list" type="radio">
+						<label for="createnew_caption"><i class="icon-block"></i> 新規作成</label>
 						<div class="foldmenu">
-							xxx
+							<label for="createnew_size">サイズ: </label>
+							<input type="number" id="createnew_size" name="createnew_size" value="32" min="16" max="128">
+							<button id="createnew_ok">OK</button>
 						</div>
-					<li>
-						<input id="mainmenu_finder" name="mainmenu_list" type="radio">
-						<label for="mainmenu_finder"><i class="icon-block"></i> ファイル一覧</label>
-						<div class="foldmenu">
-							xxx
-						</div>
-					</li>
-					<li>
-						<input id="mainmenu_inport" name="mainmenu_list" type="radio">
-						<label for="mainmenu_inport"><i class="icon-block"></i> インポート</label>
+					<li id="mainmenu_finder">
+						<input id="mainmenu_finder_caption" name="mainmenu_list" type="radio">
+						<label for="mainmenu_finder_caption"><i class="icon-block"></i> ファイル一覧</label>
 						<div class="foldmenu">
 							xxx
 						</div>
 					</li>
-					<li>
-						<input id="mainmenu_export" name="mainmenu_list" type="radio">
-						<label for="mainmenu_export"><i class="icon-block"></i> エクスポート</label>
+					<li id="mainmenu_inport">
+						<input id="mainmenu_inport_caption" name="mainmenu_list" type="radio">
+						<label for="mainmenu_inport_caption"><i class="icon-block"></i> インポート</label>
+						<div class="foldmenu">
+							xxx
+						</div>
+					</li>
+					<li id="mainmenu_export">
+						<input id="mainmenu_export_caption" name="mainmenu_list" type="radio">
+						<label for="mainmenu_export_caption"><i class="icon-block"></i> エクスポート</label>
 						<div class="foldmenu">
 							xxx
 						</div>

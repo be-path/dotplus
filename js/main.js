@@ -94,10 +94,17 @@
 		if (!load_data) return;
 
 		var loaded_filename = load_data.filename;
-
 		if (loaded_filename === undefined || loaded_filename === "") return;
 
+		var loaded_canvas_size = load_data.canvasSize;
+		if (!loaded_canvas_size) return;
+
+		var size_min = $("#createnew_size").attr("min");
+		var size_max = $("#createnew_size").attr("max");
+		loaded_canvas_size = Math.min(size_max, Math.max(size_min, loaded_canvas_size));
+
 		$("#main_filename").val(loaded_filename);
+		$("#createnew_size").val(loaded_canvas_size);
 
 		return true;
 	}
@@ -107,6 +114,7 @@
 		var save_data = {};
 
 		save_data.filename = $("#main_filename").val();
+		save_data.canvasSize = $("#createnew_size").val();
 		save_data.sysinfo = sys;
 
 		saveJSON(save_key, save_data);
@@ -114,11 +122,27 @@
 		return true;
 	}
 
-	function loadFile(name) {
-		if ((name === undefined) || (name === "")) return false;
+	function defaultData(width, height) {
+		return {
+			env: {
+				filename: getAvailableFilename(),
+				canvasWidth: width,
+				canvasHeight: height,
+				timestamp: "",
+			},
+			canvas: [{pixels: [], mask: []}],
+			palette: [{colors: [{h:180, s:50, l:50, a:1}]}]
+		};
+	}
 
-		var load_key = sys.appname+".files."+name;
-		var load_data = loadJSON(load_key);
+	function loadFile(name) {
+		var load_data;
+		if ((name === undefined) || (name === "")) {
+			load_data = defaultData(env.canvasWidth, env.canvasHeight);
+		} else {
+			load_data = loadJSON(sys.appname+".files."+name);
+		}
+
 		if (!load_data) return;
 
 		var loaded_env = load_data.env;
@@ -129,6 +153,7 @@
 		if (!loaded_env) return;
 		env = loaded_env;
 		refreshEnv();
+		$("#main_filename").val(env.filename);
 		$("#main_filetimestamp").html(env.timestamp);
 
 		// canvas
@@ -1138,13 +1163,16 @@
 			var pos = get1DPos(rect_canvas.x, rect_canvas.y);
 			var color = canvas.colorManager.getColor(canvas.pixels[pos]);
 			var darkback = false;
+			var shadow_width = env.dotWidth/10;
 			if (canvas.mask[pos] && color.l < 50) {
 				darkback = true;
 			}
 			if (darkback) {
 				this.cursorNormal.addClass("darkback");
+				this.cursorNormal.css("box-shadow", "0 0 0 "+shadow_width+"px hsla(0, 0%, 100%, 0.3)");
 			} else {
 				this.cursorNormal.removeClass("darkback");
+				this.cursorNormal.css("box-shadow", "0 0 0 "+shadow_width+"px hsla(0, 0%, 0%, 0.3)");
 			}
 
 			this.updateIndicator(rect_canvas);
@@ -1163,6 +1191,9 @@
 			});
 
 			var indicator;
+
+			var font_size = env.dotWidth/2;
+			$(".distance_indicator").css("font-size", font_size+"px");
 
 			// left
 			indicator = this.cursorNormal.find(".distance_indicator.left");
@@ -1742,7 +1773,7 @@
 			}
 			save_timer = setTimeout(function() {
 				// changing filename
-				if ($("#main_filename:focus").length) return;
+				if ($("input:focus").length) return;
 
 				saveFile(main_filename.val());
 				saveSystem();
@@ -1886,6 +1917,28 @@
 		// $("#mainmenu_export").on("click", function() {
 		// 	showDialog("#dialog_export");
 		// });
+
+		// mainmenu
+		$("#createnew_caption").on("change", function() {
+			$("#createnew_size").focus();
+		});
+		$("#createnew_ok").on("click", function() {
+			// save current file
+			if (main_filename.val() === "") {
+				main_filename.val(getAvailableFilename());
+			}
+			saveFile(main_filename.val());
+
+			var size = $("#createnew_size").val();
+			var size_min = $("#createnew_size").attr("min");
+			var size_max = $("#createnew_size").attr("max");
+			size = Math.min(size_max, Math.max(size_min, size));
+			$("#createnew_size").val(size);
+
+			env.canvasWidth = size;
+			env.canvasHeight = size;
+			loadFile(undefined);
+		});
 	});
 
 	// disable contextmenu
