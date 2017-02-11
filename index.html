@@ -7,7 +7,7 @@
 	<link rel="stylesheet" href="css/font-awesome.min.css">
 	<link rel="stylesheet" href="css/main.css">
 	<link rel="stylesheet" href="css/font.css"></head>
-</head>
+	<link href="https://fonts.googleapis.com/css?family=Ubuntu:300|Ubuntu+Mono" rel="stylesheet"></head>
 <body>
 	<div class="overlay">
 		<div class="full_table">
@@ -86,17 +86,23 @@
 				<ul class="mainmenu">
 					<li id="mainmenu_createnew">
 						<input id="createnew_caption" name="mainmenu_list" type="radio">
-						<label for="createnew_caption"><i class="icon-block"></i> 新規作成</label>
+						<label for="createnew_caption">
+							<i class="fa fa-pencil-square-o"></i>
+							<div>create new</div>
+						</label>
 						<div class="foldmenu">
 							<div class="createnew_content">
-								<label for="createnew_size">サイズ: </label>
+								<label for="createnew_size">size </label>
 								<input type="number" id="createnew_size" name="createnew_size" value="32" min="16" max="64">
 								<button id="createnew_ok">OK</button>
 							</div>
 						</div>
 					<li id="mainmenu_finder">
 						<input id="finder_caption" name="mainmenu_list" type="radio">
-						<label for="finder_caption"><i class="icon-block"></i> ファイル一覧</label>
+						<label for="finder_caption">
+							<i class="fa fa-files-o"></i>
+							<div>files</div>
+						</label>
 						<div class="foldmenu">
 							<ul class="file_list">
 							</ul>
@@ -104,16 +110,30 @@
 					</li>
 					<li id="mainmenu_inport">
 						<input id="inport_caption" name="mainmenu_list" type="radio">
-						<label for="inport_caption"><i class="icon-block"></i> インポート</label>
+						<label for="inport_caption">
+							<i class="fa fa-upload"></i>
+							<div>
+								inport
+							</div>
+						</label>
 						<div class="foldmenu">
-							xxx
+							<div class="nocontents">
+								<i class="fa fa-ban"></i>
+							</div>
 						</div>
 					</li>
 					<li id="mainmenu_export">
 						<input id="export_caption" name="mainmenu_list" type="radio">
-						<label for="export_caption"><i class="icon-block"></i> エクスポート</label>
+						<label for="export_caption">
+							<i class="fa fa-download"></i>
+							<div>
+								export
+							</div>
+						</label>
 						<div class="foldmenu">
-							xxx
+							<div class="nocontents">
+								<i class="fa fa-ban"></i>
+							</div>
 						</div>
 					</li>
 				</ul>

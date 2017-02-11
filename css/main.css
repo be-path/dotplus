@@ -14,6 +14,8 @@ html, body {
 	height: 100%;
 	background-color: hsl(0, 0%, 60%);
 	overflow: hidden;
+	font-family: "Avenir Next", "Ubuntu", sans-serif;
+	font-weight: 300;
 }
 html {
 	font-size: 16px;
@@ -26,6 +28,7 @@ input, button, textarea {
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	appearance: none;
+	font-family: "Avenir Next", "Ubuntu", sans-serif;
 }
 input[type="number"] {
 	border-radius: 50px;
@@ -34,7 +37,7 @@ input[type="number"] {
 	box-shadow: inset 1px 1px 5px 0 hsla(0, 0%, 0%, 0);
 	color: hsla(0, 0%, 100%, 0.6);
 	font-size: 0.8rem;
-	font-family: monospace;
+	font-family: "Ubuntu Mono", monospace;
 	text-shadow: 1px 1px 4px hsla(0, 0%, 0%, 0.2);
 	text-align: right;
 	transition-property: all;
@@ -55,6 +58,7 @@ input[type="number"]::-webkit-inner-spin-button {
 	-webkit-appearance: none;
 	margin: 0;
 }
+
 button {
 	background-color: hsla(180, 50%, 50%, 0.1);
 	box-shadow: 1px 1px 10px 0 hsla(0, 0%, 0%, 0.3), inset 1px 1px 6px 0 hsla(0, 0%, 0%, 0.1), inset 1px 1px 10px 0 hsla(0, 0%, 0%, 0.2);
@@ -66,7 +70,15 @@ button {
 	cursor: pointer;
 }
 button:hover {
-	background-color: hsla(180, 50%, 50%, 0.15);
+	background-color: hsla(180, 50%, 50%, 0.2);
+}
+button.button_remove {
+	padding: 10px;
+	background-color: hsla(0, 50%, 50%, 0.1);
+	color: hsla(0, 50%, 90%, 1);
+}
+button.button_remove:hover {
+	background-color: hsla(0, 50%, 50%, 0.2);
 }
 
 .overlay {
@@ -195,7 +207,7 @@ button:hover {
 	display: none;
 }
 .palette_scroller {
-	background-color: hsla(0, 0%, 25%, 0.8);
+	background-color: hsl(0, 0%, 25%);
 	color: hsl(0, 0%, 80%);
 	text-shadow: 1px 1px 4px hsla(0, 0%, 0%, 0.2);
 	text-align: center;
@@ -206,11 +218,11 @@ button:hover {
 	cursor: pointer;
 }
 .palette_scroller:hover {
-	background-color: hsla(0, 0%, 25%, 0.7);
+	background-color: hsl(0, 0%, 30%);
 	text-align: center;
 }
 .color_selector {
-	background-color: hsla(0, 0%, 25%, 0.8);
+	background-color: hsl(0, 0%, 25%);
 	padding: 10px 10px;
 	text-align: center;
 }
@@ -250,7 +262,6 @@ button:hover {
 	transition-delay: 0.2s;
 }
 .tools {
-	background-color: hsla(0, 0%, 25%, 0.1);
 	box-shadow: 0 0 10px 0 hsla(0, 0%, 0%, 0.2);
 	font-size: 0;
 }
@@ -264,9 +275,9 @@ button:hover {
 	height: 40px;
 	padding: 10px;
 	cursor: pointer;
-	background-color: hsla(0, 0%, 25%, 0.8);
+	background-color: hsl(0, 0%, 25%);
 	color: hsl(0, 0%, 80%);
-	box-shadow: inset 0 0 0 0 hsl(180, 50%, 50%), inset 1px 1px 10px 0 hsla(0, 0%, 0%, 0.3);
+	box-shadow: inset 1px 1px 10px 0 hsla(0, 0%, 0%, 0.3);
 	text-shadow: 1px 1px 4px hsla(0, 0%, 0%, 0.2);
 	font-size: 1rem;
 	transition-property: all;
@@ -274,7 +285,7 @@ button:hover {
 	transition-timing-function: ease-out;
 }
 .tools li label:hover {
-	background-color: hsla(0, 0%, 25%, 0.6);
+	background-color: hsl(0, 0%, 30%);
 }
 .tools li label i {
 	display: inline-block;
@@ -283,8 +294,7 @@ button:hover {
 	text-align: center;
 }
 .tools input[type="radio"]:checked + label {
-	box-shadow: inset 0 0 0 2px #9cc;
-	background-color: hsla(0, 0%, 25%, 0.7);
+	background-color: hsl(180, 20%, 50%);
 }
 .tools input[type="radio"] {
 	display: none;
@@ -299,7 +309,7 @@ button:hover {
 	padding: 10px;
 	width: 200px;
 	color: #666;
-	background-color: hsla(0, 0%, 90%, 0.7);
+	background-color: hsl(0, 0%, 85%);
 	box-shadow: 0 0 10px 0 hsla(0, 0%, 0%, 0.2);
 	text-shadow: 1px 1px 4px hsla(0, 0%, 0%, 0.2);
 	font-size: 0;
@@ -309,7 +319,7 @@ button:hover {
 	transition-timing-function: ease-out;
 }
 .main_filename_wrapper:hover {
-	background-color: hsla(0, 0%, 90%, 0.9);
+	background-color: hsl(0, 0%, 90%);
 }
 .main_filename_wrapper input[name="main_filename"] {
 	display: inline-block;
@@ -333,6 +343,7 @@ button:hover {
 	padding: 2px;
 	font-size: 0.6rem;
 	text-align: right;
+	font-family: "Ubuntu Mono", monospace;
 }
 .main_filetimestamp::before {
 	font-family: FontAwesome;
@@ -340,7 +351,7 @@ button:hover {
 	padding: 0 5px;
 }
 .main_filetimestamp.saved::before {
-	content: "\f058";
+	content: "\f0c7";
 }
 
 .main_toggle_button {
@@ -350,7 +361,7 @@ button:hover {
 	padding: 10px 20px;
 	color: #666;
 	cursor: pointer;
-	background-color: hsla(0, 0%, 90%, 0.7);
+	background-color: hsl(0, 0%, 85%);
 	box-shadow: 0 0 10px 0 hsla(0, 0%, 0%, 0.2);
 	text-shadow: 1px 1px 4px hsla(0, 0%, 0%, 0.2);
 	font-size: 1rem;
@@ -360,7 +371,7 @@ button:hover {
 	transition-timing-function: ease-out;
 }
 .main_toggle_button:hover {
-	background-color: hsla(0, 0%, 90%, 0.9);
+	background-color: hsl(0, 0%, 90%);
 }
 
 .mainmenu_wrapper {
@@ -373,7 +384,6 @@ button:hover {
 	transition-delay: 0.2s;
 }
 .mainmenu {
-	background-color: hsla(0, 0%, 25%, 0.1);
 	box-shadow: 0 0 10px 0 hsla(0, 0%, 0%, 0.2);
 	font-size: 0;
 }
@@ -381,29 +391,35 @@ button:hover {
 	display: none;
 }
 .mainmenu > li > label {
-	display: block;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-justify-content: space-between;
+	justify-content: space-between;
+	-webkit-align-items: center;
+
 	padding: 10px 20px;
 	cursor: pointer;
-	background-color: hsla(0, 0%, 25%, 0.8);
+	background-color: hsl(0, 0%, 25%);
 	color: hsl(0, 0%, 80%);
 	box-shadow: inset 1px 1px 10px 0 hsla(0, 0%, 0%, 0.3);
 	text-shadow: 1px 1px 4px hsla(0, 0%, 0%, 0.2);
 	font-size: 1rem;
+	text-align: center;
 	transition-property: all;
 	transition-duration: 0.2s;
 	transition-timing-function: ease-out;
 }
 .mainmenu > li > label:hover {
-	background-color: hsla(0, 0%, 25%, 0.6);
+	background-color: hsl(0, 0%, 30%);
 }
 .mainmenu input[type="radio"]:checked + label {
-	box-shadow: inset 0 0 0 2px #9cc;
-	background-color: hsla(0, 0%, 25%, 0.7);
+	background-color: hsl(180, 20%, 50%);
 }
 
 .mainmenu .foldmenu {
 	display: none;
-	background-color: hsla(0, 0%, 12%, 0.8);
+	background-color: hsl(0, 0%, 15%);
+	border-left: 5px solid hsl(180, 20%, 50%);
 	color: hsl(0, 0%, 80%);
 	box-shadow: inset 1px 1px 10px 0 hsla(0, 0%, 0%, 0.3);
 	text-shadow: 1px 1px 4px hsla(0, 0%, 0%, 0.2);
@@ -412,6 +428,9 @@ button:hover {
 }
 .mainmenu input[type="radio"]:checked ~ .foldmenu {
 	display: block;
+}
+.mainmenu .nocontents {
+	padding: 10px 20px;
 }
 
 .createnew_content {
@@ -427,10 +446,15 @@ button:hover {
 	overflow-y: scroll;
 }
 .file_list li {
-	display: block;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-justify-content: space-between;
+	justify-content: space-between;
+	-webkit-align-items: center;
+	align-items: center;
 	padding: 10px 20px;
 	cursor: pointer;
-	background-color: hsla(0, 0%, 20%, 0.8);
+	background-color: hsl(0, 0%, 15%);
 	color: hsl(0, 0%, 80%);
 	box-shadow: inset 1px 1px 10px 0 hsla(0, 0%, 0%, 0.3);
 	text-shadow: 1px 1px 4px hsla(0, 0%, 0%, 0.2);
@@ -440,10 +464,13 @@ button:hover {
 	transition-timing-function: ease-out;
 }
 .file_list li:hover {
-	background-color: hsla(0, 0%, 22%, 0.8);
+	background-color: hsl(0, 0%, 20%);
 }
 .file_list li.file_current {
 	background-color: hsla(180, 50%, 50%, 0.15);
+}
+.file_list li .caption {
+	overflow: hidden;
 }
 
 .cursor_normal {
@@ -468,6 +495,7 @@ button:hover {
 	height: 100%;
 	color: hsl(0, 0%, 0%);
 	font-size: 2vmin;
+	font-family: "Ubuntu Mono", monospace;
 	pointer-events: none;
 	transition-property: all;
 	transition-duration: 0.1s;

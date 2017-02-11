@@ -255,6 +255,15 @@
 		return true;
 	}
 
+	function removeFile(name) {
+		if ((name === undefined) || (!loadFile(name))) return;
+
+		var remove_key = sys.appname+".files."+name;
+		localStorage.removeItem(remove_key);
+
+		return true;
+	}
+
 	function getAvailableFilename() {
 		var f = function() {
 			return "img_" + zeroPadding(Math.round(Math.random() * 0xffffff).toString(16), 6);
@@ -1792,29 +1801,61 @@
 		}
 
 		showFileList() {
+			var self = this;
 			var file_list = getFileList();
 			var file_list_elem = this.menu.find(".file_list");
 			file_list_elem.html("");
+
+			if (!file_list.length) {
+				var caption = $("<div>");
+				caption.html("<i class='icon-block'></i>");
+				caption.addClass("nocontents");
+				file_list_elem.append(caption);
+				return;
+			}
+
 			for (var i = 0; i < file_list.length; i++) {
 				var file = file_list[i];
+
 				var li = $("<li>");
-				li.html(file.env.filename);
 				li.attr("filename", file.env.filename);
 				li.attr("timestamp", file.env.timestamp);
 				if ($("#main_filename").val() == file.env.filename) {
 					li.addClass("file_current");
 				}
-				li.on("click", function() {
-					var filename = $(this).attr("filename");
-					if (loadFile(filename)) {
-						$(".file_current").removeClass("file_current");
-						$(this).addClass("file_current");
-						historyManager = new HistoryManager();
-						historyManager.takeHistory("init");
-					}
-				});
+
+				var caption = $("<div>");
+				caption.html(file.env.filename);
+				caption.addClass("caption");
+
+				var button_remove = $("<button>");
+				button_remove.html("<i class='icon-trash'></i>");
+				button_remove.addClass("button_remove");
+
+				li.append(caption);
+				li.append(button_remove);
 				file_list_elem.append(li);
 			}
+
+			file_list_elem.find("li").on("click", function() {
+				console.debug("parent");
+				var filename = $(this).attr("filename");
+				if (loadFile(filename)) {
+					$(".file_current").removeClass("file_current");
+					$(this).addClass("file_current");
+					historyManager = new HistoryManager();
+					historyManager.takeHistory("init");
+				}
+			});
+
+			file_list_elem.find(".button_remove").on("click", function(evt) {
+				console.debug("child");
+				var filename = $(this).parent().attr("filename");
+				removeFile(filename);
+				self.showFileList();
+				evt.stopPropagation();
+				return false;
+			});
 		}
 	}
 
