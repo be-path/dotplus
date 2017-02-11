@@ -507,6 +507,10 @@ button.button_cancel:hover {
 	overflow: hidden;
 }
 
+.export_content {
+	padding: 10px 20px;
+}
+
 .cursor_normal {
 	position: absolute;
 	display: none;

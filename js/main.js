@@ -1009,7 +1009,7 @@
 			return true;
 		}
 
-		render() {
+		render(noguide) {
 			var color, color_str, color_index;
 			var screen_rect;
 			var ctx = this.context;
@@ -1028,41 +1028,45 @@
 						ctx.fillStyle = hslaToString(color);
 						ctx.fillRect(screen_rect.x, screen_rect.y, screen_rect.w, screen_rect.h);
 
-						// draw hovered color indicator
-						if (this.colorManager.hoveredIndex == color_index) {
+						if (!noguide) {
+							// draw hovered color indicator
+							if (this.colorManager.hoveredIndex == color_index) {
+								ctx.beginPath();
+								ctx.fillStyle = hslaToString({
+									h: color.h,
+									s: color.s,
+									l: (color.l > 50) ? 0 : 100,
+									a: 0.2
+								});
+								ctx.arc(
+									screen_rect.x + env.dotWidth/2,
+									screen_rect.y + env.dotHeight/2,
+									env.dotWidth/6,
+									0, Math.PI*2, false
+								);
+								ctx.fill();
+							}
+						}
+					}
+
+					if (!noguide) {
+						// draw grid
+						if (i && j) {
 							ctx.beginPath();
 							ctx.fillStyle = hslaToString({
-								h: color.h,
-								s: color.s,
-								l: (color.l > 50) ? 0 : 100,
+								h: 0,
+								s: 0,
+								l: (!color || !this.mask[pos] || color.l > 50) ? 0 : 100,
 								a: 0.2
 							});
 							ctx.arc(
-								screen_rect.x + env.dotWidth/2,
-								screen_rect.y + env.dotHeight/2,
-								env.dotWidth/6,
+								screen_rect.x,
+								screen_rect.y,
+								1,
 								0, Math.PI*2, false
 							);
 							ctx.fill();
 						}
-					}
-
-					// draw grid
-					if (i && j) {
-						ctx.beginPath();
-						ctx.fillStyle = hslaToString({
-							h: 0,
-							s: 0,
-							l: (!color || !this.mask[pos] || color.l > 50) ? 0 : 100,
-							a: 0.2
-						});
-						ctx.arc(
-							screen_rect.x,
-							screen_rect.y,
-							1,
-							0, Math.PI*2, false
-						);
-						ctx.fill();
 					}
 				}
 			}
@@ -2074,6 +2078,15 @@
 			env.canvasWidth = size;
 			env.canvasHeight = size;
 			loadFile(undefined);
+		});
+
+		$("#export_png").on("click", function() {
+			canvasControllers[0].render(true);
+			var href = canvasControllers[0].context.canvas.toDataURL("image/png");
+			window.open(href, "_blank");
+
+			canvasControllers[0].render();
+			return false;
 		});
 
 		var finder = new Finder($("#mainmenu_finder"));
