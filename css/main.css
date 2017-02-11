@@ -9,6 +9,17 @@
 	background-color: hsla(0, 0%, 25%, 0.8);
 	color: hsl(0, 0%, 80%);
 }
+::-webkit-scrollbar {
+	width: 5px;
+}
+::-webkit-scrollbar-track {
+	background-color: transparent;
+}
+::-webkit-scrollbar-thumb {
+	box-shadow: 1px 1px 10px 0 hsla(0, 0%, 0%, 0.3), inset 1px 1px 3px 0 hsla(0, 0%, 0%, 0.2), inset 1px 1px 8px 0 hsla(0, 0%, 0%, 0.2);
+	background-color: hsla(0, 0%, 100%, 0.5);
+}
+
 html, body {
 	width: 100%;
 	height: 100%;
@@ -62,7 +73,7 @@ input[type="number"]::-webkit-inner-spin-button {
 button {
 	background-color: hsla(180, 50%, 50%, 0.1);
 	box-shadow: 1px 1px 10px 0 hsla(0, 0%, 0%, 0.3), inset 1px 1px 6px 0 hsla(0, 0%, 0%, 0.1), inset 1px 1px 10px 0 hsla(0, 0%, 0%, 0.2);
-	color: hsla(180, 50%, 90%, 1);
+	color: hsl(180, 50%, 90%);
 	padding: 10px 20px;
 	transition-property: all;
 	transition-duration: 0.2s;
@@ -75,10 +86,24 @@ button:hover {
 button.button_remove {
 	padding: 10px;
 	background-color: hsla(0, 50%, 50%, 0.1);
-	color: hsla(0, 50%, 90%, 1);
+	color: hsl(0, 50%, 90%);
 }
 button.button_remove:hover {
 	background-color: hsla(0, 50%, 50%, 0.2);
+}
+button.button_ok {
+	background-color: hsla(210, 50%, 50%, 0.1);
+	color: hsl(210, 50%, 90%);
+}
+button.button_ok:hover {
+	background-color: hsla(210, 50%, 50%, 0.2);
+}
+button.button_cancel {
+	background-color: hsla(0, 0%, 50%, 0.1);
+	color: hsl(0, 0%, 90%);
+}
+button.button_cancel:hover {
+	background-color: hsla(0, 0%, 50%, 0.2);
 }
 
 .overlay {
@@ -153,9 +178,10 @@ button.button_remove:hover {
 	position: relative;
 	background-color: hsla(0, 0%, 100%, 0.2);
 	background-image: url('../img/bg.png');
-	width: 200px;
+	width: 220px;
 	height: 200px;
-	overflow: hidden;
+	overflow-x: hidden;
+	overflow-y: scroll;
 	transition-property: all;
 	transition-duration: 0.2s;
 	transition-timing-function: ease-out;
@@ -434,6 +460,12 @@ button.button_remove:hover {
 }
 
 .createnew_content {
+	display: -webkit-flex;
+	display: flex;
+	-webkit-justify-content: space-between;
+	justify-content: space-between;
+	-webkit-align-items: center;
+	align-items: center;
 	padding: 10px 20px;
 }
 #createnew_size {
@@ -444,6 +476,7 @@ button.button_remove:hover {
 	max-height: 50vh;
 	overflow-x: hidden;
 	overflow-y: scroll;
+	width: 220px;
 }
 .file_list li {
 	display: -webkit-flex;
@@ -452,6 +485,7 @@ button.button_remove:hover {
 	justify-content: space-between;
 	-webkit-align-items: center;
 	align-items: center;
+	width: 200px;
 	padding: 10px 20px;
 	cursor: pointer;
 	background-color: hsl(0, 0%, 15%);

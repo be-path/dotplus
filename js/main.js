@@ -275,10 +275,46 @@
 		return result;
 	}
 
-	function showDialog(selector) {
-		console.debug(selector);
-		$(".dialog").hide();
-		$(selector).show();
+	function showDialog(title, content, callback_ok, callback_cancel) {
+		var elem_title = $("<div></div>", {
+			"class": "dialog_title",
+			html: title
+		});
+		var elem_content = $("<div></div>", {
+			"class": "dialog_content",
+			html: content
+		});
+		var element_button_cancel = $("<button></button>", {
+			"class": "button_cancel",
+			html: "Cancel"
+		});
+		element_button_cancel.on("click", function() {
+			if (typeof(callback_cancel) === "function") {
+				callback_cancel();
+			}
+			$(".overlay").fadeOut();
+		});
+		var element_button_ok = $("<button></button>", {
+			"class": "button_ok",
+			html: "OK"
+		});
+		element_button_ok.on("click", function() {
+			if (typeof(callback_ok) === "function") {
+				callback_ok();
+			}
+			$(".overlay").fadeOut();
+		});
+
+		$(".dialog").html("");
+		if (title !== "") {
+			$(".dialog").append(elem_title);
+		}
+		if (content !== "") {
+			$(".dialog").append(elem_content);
+		}
+		$(".dialog").append(element_button_cancel);
+		$(".dialog").append(element_button_ok);
+
 		$(".overlay").fadeIn();
 	}
 
@@ -1838,7 +1874,6 @@
 			}
 
 			file_list_elem.find("li").on("click", function() {
-				console.debug("parent");
 				var filename = $(this).attr("filename");
 				if (loadFile(filename)) {
 					$(".file_current").removeClass("file_current");
@@ -1849,10 +1884,11 @@
 			});
 
 			file_list_elem.find(".button_remove").on("click", function(evt) {
-				console.debug("child");
 				var filename = $(this).parent().attr("filename");
-				removeFile(filename);
-				self.showFileList();
+				showDialog("remove '"+filename+"' ?", "", function() {
+					removeFile(filename);
+					self.showFileList();
+				}, undefined);
 				evt.stopPropagation();
 				return false;
 			});
@@ -2017,18 +2053,6 @@
 		$(".dialog").on("click", function() {
 			return false;
 		});
-		// $("#mainmenu_createnew").on("click", function() {
-		// 	showDialog("#dialog_createnew");
-		// });
-		// $("#mainmenu_open").on("click", function() {
-		// 	showDialog("#dialog_open");
-		// });
-		// $("#mainmenu_inport").on("click", function() {
-		// 	showDialog("#dialog_inport");
-		// });
-		// $("#mainmenu_export").on("click", function() {
-		// 	showDialog("#dialog_export");
-		// });
 
 		// mainmenu
 		$("#createnew_caption").on("change", function() {
