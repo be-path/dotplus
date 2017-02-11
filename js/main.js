@@ -122,6 +122,38 @@
 		return true;
 	}
 
+	function getFileList() {
+		var result = [];
+		var key, item;
+		for (var i = localStorage.length; i--; ) {
+			key = localStorage.key(i);
+			if (!key) continue;
+
+			var key_split = key.split(".");
+			if (key_split[0] != sys.appname || key_split[1] != "files") continue;
+
+			item = loadJSON(key);
+			if (!item || !item.env) continue;
+			result.push(item);
+		}
+
+		result.sort(function(a, b) {
+			var timestamp_a = a.env.timestamp;
+			var timestamp_b = b.env.timestamp;
+			if (timestamp_a < timestamp_b) return 1;
+			if (timestamp_a > timestamp_b) return -1;
+
+			var filename_a = a.env.timestamp;
+			var filename_b = b.env.timestamp;
+			if (filename_a < filename_b) return -1;
+			if (filename_a > filename_b) return 1;
+
+			return 0;
+		});
+
+		return result;
+	}
+
 	function defaultData(width, height) {
 		return {
 			env: {
@@ -1748,6 +1780,45 @@
 	}
 
 	/* ======================================================================== */
+	class Finder {
+		constructor(menu) {
+			this.menu = menu;
+			this.fileList = [];
+
+			var self = this;
+			menu.find("input[name='mainmenu_list']").on("change", function() {
+				self.showFileList();
+			});
+		}
+
+		showFileList() {
+			var file_list = getFileList();
+			var file_list_elem = this.menu.find(".file_list");
+			file_list_elem.html("");
+			for (var i = 0; i < file_list.length; i++) {
+				var file = file_list[i];
+				var li = $("<li>");
+				li.html(file.env.filename);
+				li.attr("filename", file.env.filename);
+				li.attr("timestamp", file.env.timestamp);
+				if ($("#main_filename").val() == file.env.filename) {
+					li.addClass("file_current");
+				}
+				li.on("click", function() {
+					var filename = $(this).attr("filename");
+					if (loadFile(filename)) {
+						$(".file_current").removeClass("file_current");
+						$(this).addClass("file_current");
+						historyManager = new HistoryManager();
+						historyManager.takeHistory("init");
+					}
+				});
+				file_list_elem.append(li);
+			}
+		}
+	}
+
+	/* ======================================================================== */
 	$(document).ready(function() {
 		// env
 		refreshEnv();
@@ -1939,6 +2010,8 @@
 			env.canvasHeight = size;
 			loadFile(undefined);
 		});
+
+		var finder = new Finder($("#mainmenu_finder"));
 	});
 
 	// disable contextmenu

@@ -400,6 +400,7 @@ button:hover {
 	box-shadow: inset 0 0 0 2px #9cc;
 	background-color: hsla(0, 0%, 25%, 0.7);
 }
+
 .mainmenu .foldmenu {
 	display: none;
 	background-color: hsla(0, 0%, 12%, 0.8);
@@ -407,14 +408,42 @@ button:hover {
 	box-shadow: inset 1px 1px 10px 0 hsla(0, 0%, 0%, 0.3);
 	text-shadow: 1px 1px 4px hsla(0, 0%, 0%, 0.2);
 	font-size: 0.8rem;
-	padding: 10px 20px;
 	text-align: center;
 }
 .mainmenu input[type="radio"]:checked ~ .foldmenu {
 	display: block;
 }
-#mainmenu_createnew input[name="createnew_size"] {
-	width:3rem;
+
+.createnew_content {
+	padding: 10px 20px;
+}
+#createnew_size {
+	width: 3rem;
+}
+
+.file_list {
+	max-height: 50vh;
+	overflow-x: hidden;
+	overflow-y: scroll;
+}
+.file_list li {
+	display: block;
+	padding: 10px 20px;
+	cursor: pointer;
+	background-color: hsla(0, 0%, 20%, 0.8);
+	color: hsl(0, 0%, 80%);
+	box-shadow: inset 1px 1px 10px 0 hsla(0, 0%, 0%, 0.3);
+	text-shadow: 1px 1px 4px hsla(0, 0%, 0%, 0.2);
+	font-size: 1rem;
+	transition-property: all;
+	transition-duration: 0.2s;
+	transition-timing-function: ease-out;
+}
+.file_list li:hover {
+	background-color: hsla(0, 0%, 22%, 0.8);
+}
+.file_list li.file_current {
+	background-color: hsla(180, 50%, 50%, 0.15);
 }
 
 .cursor_normal {
