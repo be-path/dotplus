@@ -1188,6 +1188,7 @@
 			};
 
 			this.button.on("change", function() {
+				self.down = false;
 				self.activateHandler();
 			});
 
@@ -1205,7 +1206,7 @@
 			});
 
 			this.canvasWrapper.on("mouseup", function(evt) {
-				if (!self.isActive()) return;
+				if (!self.isActive() || !self.down) return;
 				self.down = false;
 				var pos = self.getRelativePos(evt);
 				self.mouseupAction(pos);
@@ -1507,6 +1508,10 @@
 				var canvas = canvasControllers[0];
 				historyManager.takeHistory("dropper");
 			}
+		}
+
+		activateHandler() {
+			this.initializeCursorUI();
 		}
 	}
 
