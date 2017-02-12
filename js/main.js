@@ -2081,8 +2081,32 @@
 		});
 
 		$("#export_png").on("click", function() {
+			var ratio = $("#export_size").val();
+			if (!ratio || (ratio <= 0)) {
+				return;
+			}
+
+			var src_width = env.screenWidth;
+			var src_height = env.screenHeight;
+			var dst_width = src_width * ratio / 100;
+			var dst_height = src_height * ratio / 100;
+
+			var canvas_dst_ = $("<canvas></canvas>");
+			canvas_dst_.attr("width", dst_width);
+			canvas_dst_.attr("height", dst_height);
+			var canvas_dst = canvas_dst_[0];
+
 			canvasControllers[0].render(true);
-			var href = canvasControllers[0].context.canvas.toDataURL("image/png");
+
+			var canvas_src = canvasControllers[0].context.canvas;
+			var context_dst = canvas_dst.getContext("2d");
+			var context_src = canvasControllers[0].context;
+
+			var image = context_src.getImageData(0, 0, src_width, src_height);
+			//context_dst.putImageData(image, 0, 0);
+			context_dst.drawImage(canvas_src, 0, 0, src_width, src_height, 0, 0, dst_width, dst_height);
+
+			var href = canvas_dst.toDataURL("image/png");
 			window.open(href, "_blank");
 
 			canvasControllers[0].render();

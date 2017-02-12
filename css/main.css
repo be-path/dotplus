@@ -6,8 +6,8 @@
 	box-sizing: border-box;
 }
 ::selection {
-	background-color: hsla(0, 0%, 25%, 0.8);
-	color: hsl(0, 0%, 80%);
+	background-color: hsla(0, 0%, 80%, 0.8);
+	color: hsl(0, 0%, 20%);
 }
 ::-webkit-scrollbar {
 	width: 5px;
@@ -508,7 +508,16 @@ button.button_cancel:hover {
 }
 
 .export_content {
+	display: -webkit-flex;
+	display: flex;
+	-webkit-justify-content: space-between;
+	justify-content: space-between;
+	-webkit-align-items: center;
+	align-items: center;
 	padding: 10px 20px;
+}
+#export_size {
+	width: 3rem;
 }
 
 .cursor_normal {
