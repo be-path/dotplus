@@ -196,19 +196,21 @@
 
 		// palette
 		if (!loaded_palette) return;
-		canvasControllers[0].colorManager.colors = [];
+		var color_manager = canvasControllers[0].colorManager;
+		color_manager.colors = [];
 		var color;
 		for (var i = 0; i < loaded_palette[0].colors.length; i++) {
 			color = loaded_palette[0].colors[i];
 			if (!color) continue;
-			canvasControllers[0].colorManager.colors[i] = new Color(
+			color_manager.colors[i] = new Color(
 				color.h,
 				color.s,
 				color.l,
 				color.a
 			);
 		}
-		canvasControllers[0].colorManager.updatePaletteUI();
+		color_manager.activateColor(0);
+		color_manager.updatePaletteUI();
 
 		return true;
 	}
