@@ -266,7 +266,7 @@
 
 	function getAvailableFilename() {
 		var f = function() {
-			return "img_" + zeroPadding(Math.round(Math.random() * 0xffffff).toString(16), 6);
+			return "notitle_" + zeroPadding(Math.round(Math.random() * 0xffffff).toString(16), 6);
 		};
 		var result = f();
 		while (loadFile(result)) {
@@ -312,8 +312,12 @@
 		if (content !== "") {
 			$(".dialog").append(elem_content);
 		}
-		$(".dialog").append(element_button_cancel);
-		$(".dialog").append(element_button_ok);
+		if (typeof(callback_cancel) === "function") {
+			$(".dialog").append(element_button_cancel);
+		}
+		if (typeof(callback_ok) === "function") {
+			$(".dialog").append(element_button_ok);
+		}
 
 		$(".overlay").fadeIn();
 	}
@@ -1918,7 +1922,7 @@
 				showDialog("remove '"+filename+"' ?", "", function() {
 					removeFile(filename);
 					self.showFileList();
-				}, undefined);
+				}, function() {});
 				evt.stopPropagation();
 				return false;
 			});
@@ -2112,16 +2116,16 @@
 			loadFile(undefined);
 		});
 
-		$("#export_png").on("click", function() {
-			var ratio = $("#export_size").val();
-			if (!ratio || (ratio <= 0)) {
+		$("#download_png").on("click", function() {
+			var size = $("#download_size").val();
+			if (!size || (size <= 0)) {
 				return;
 			}
 
 			var src_width = env.screenWidth;
 			var src_height = env.screenHeight;
-			var dst_width = src_width * ratio / 100;
-			var dst_height = src_height * ratio / 100;
+			var dst_width = size;
+			var dst_height = size;
 
 			var canvas_dst_ = $("<canvas></canvas>");
 			canvas_dst_.attr("width", dst_width);

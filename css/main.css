@@ -333,8 +333,8 @@ button.button_cancel:hover {
 }
 .tools li label::after {
 	position: absolute;
-	right: -25%;
-	top: -25%;
+	right: -30%;
+	top: -30%;
 	content: attr(key);
 	background-color: hsla(0, 0%, 0%, 0.2);
 	box-shadow: 1px 1px 10px 0 hsla(0, 0%, 0%, 0.3);
@@ -507,7 +507,7 @@ button.button_cancel:hover {
 	justify-content: space-between;
 	-webkit-align-items: center;
 	align-items: center;
-	padding: 10px 20px;
+	padding: 10px 15px;
 }
 #createnew_size {
 	width: 3rem;
@@ -548,17 +548,17 @@ button.button_cancel:hover {
 	overflow: hidden;
 }
 
-.export_content {
+.download_content {
 	display: -webkit-flex;
 	display: flex;
 	-webkit-justify-content: space-between;
 	justify-content: space-between;
 	-webkit-align-items: center;
 	align-items: center;
-	padding: 10px 20px;
+	padding: 10px 15px;
 }
-#export_size {
-	width: 3rem;
+#download_size {
+	width: 2.5rem;
 }
 
 .cursor_normal {
