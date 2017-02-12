@@ -428,7 +428,7 @@
 			}
 			this.undo_animation_timer = setTimeout(function() {
 				$("#tool_undo").removeClass("execute");
-			}, 400);
+			}, 200);
 
 			return true;
 		}
@@ -452,7 +452,7 @@
 			}
 			this.redo_animation_timer = setTimeout(function() {
 				$("#tool_redo").removeClass("execute");
-			}, 400);
+			}, 200);
 
 
 			return true;
