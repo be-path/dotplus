@@ -407,18 +407,17 @@ button.button_cancel:hover {
 .main_filetimestamp {
 	width: 100%;
 	display: block;
-	padding: 2px;
 	font-size: 0.6rem;
 	text-align: right;
 	font-family: "Ubuntu Mono", monospace;
 }
 .main_filetimestamp::before {
 	font-family: FontAwesome;
-	content: "";
+	content: "\f0c7";
 	padding: 0 5px;
 }
 .main_filetimestamp.saved::before {
-	content: "\f0c7";
+	content: "\f058";
 }
 
 .main_toggle_button {
