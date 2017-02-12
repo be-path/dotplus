@@ -293,19 +293,20 @@ button.button_cancel:hover {
 }
 .tools li {
 	display: inline-block;
-	font-size: 1rem;
+	vertical-align: top;
 }
 .tools li label {
+	position: relative;
 	display: block;
-	width: 40px;
-	height: 40px;
-	padding: 10px;
+	width: 50px;
+	height: 50px;
 	cursor: pointer;
 	background-color: hsl(0, 0%, 25%);
 	color: hsl(0, 0%, 80%);
 	box-shadow: inset 1px 1px 10px 0 hsla(0, 0%, 0%, 0.3);
 	text-shadow: 1px 1px 4px hsla(0, 0%, 0%, 0.2);
-	font-size: 1rem;
+	font-size: 1.4rem;
+	overflow: hidden;
 	transition-property: all;
 	transition-duration: 0.2s;
 	transition-timing-function: ease-out;
@@ -313,17 +314,57 @@ button.button_cancel:hover {
 .tools li label:hover {
 	background-color: hsl(0, 0%, 30%);
 }
-.tools li label i {
-	display: inline-block;
-	position: absolute;
-	font-size: 1.4rem;
-	text-align: center;
-}
 .tools input[type="radio"]:checked + label {
 	background-color: hsl(180, 20%, 50%);
 }
 .tools input[type="radio"] {
 	display: none;
+}
+.tools .tool_icon_container {
+	display: table;
+	width: 100%;
+	height: 100%;
+	line-height: 0;
+}
+.tools .tool_icon_container .tool_icon {
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
+}
+.tools li label::after {
+	position: absolute;
+	right: -25%;
+	top: -25%;
+	content: attr(key);
+	background-color: hsla(0, 0%, 0%, 0.2);
+	box-shadow: 1px 1px 10px 0 hsla(0, 0%, 0%, 0.3);
+	text-shadow: 1px 1px 4px hsla(0, 0%, 0%, 0.2);
+	border-radius: 0 0 0 50px;
+	font-size: 0.6rem;
+	padding: 2px 2px 7px 7px;
+	width: 20%;
+	height: 20%;
+	text-align: center;
+	transition-property: all;
+	transition-duration: 0.1s;
+	transition-timing-function: ease-out;
+}
+.tools li label:hover::after {
+	right: 0;
+	top: 0;
+}
+.tools li.dummy label {
+	background-color: hsl(0, 0%, 20%);
+	box-shadow: none;
+}
+.tools li.dummy label:hover {
+	background-color: hsl(0, 0%, 20%);
+}
+.tools li.dummy label::after {
+	display: none;
+}
+.tools li label.execute {
+	background-color: hsl(180, 20%, 50%);
 }
 
 .main_filename_wrapper {
@@ -486,13 +527,13 @@ button.button_cancel:hover {
 	-webkit-align-items: center;
 	align-items: center;
 	width: 200px;
-	padding: 10px 20px;
+	padding: 5px 10px;
 	cursor: pointer;
 	background-color: hsl(0, 0%, 15%);
 	color: hsl(0, 0%, 80%);
 	box-shadow: inset 1px 1px 10px 0 hsla(0, 0%, 0%, 0.3);
 	text-shadow: 1px 1px 4px hsla(0, 0%, 0%, 0.2);
-	font-size: 1rem;
+	font-size: 0.8rem;
 	transition-property: all;
 	transition-duration: 0.2s;
 	transition-timing-function: ease-out;

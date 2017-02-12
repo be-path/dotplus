@@ -348,6 +348,9 @@
 			this.history = [];
 			this.pointer = -1;
 			this.counter = 0;
+
+			this.undo_animation_timer = undefined;
+			this.redo_animation_timer = undefined;
 		}
 
 		hasAnyChangeFrom(counter) {
@@ -413,6 +416,17 @@
 
 			var history = clone(this.history[p]);
 			this.update(history);
+
+			// button animation
+			$("#tool_undo").addClass("execute");
+			if (this.undo_animation_timer) {
+				clearTimeout(this.undo_animation_timer);
+			}
+			this.undo_animation_timer = setTimeout(function() {
+				$("#tool_undo").removeClass("execute");
+			}, 400);
+
+			return true;
 		}
 
 		redo() {
@@ -426,6 +440,18 @@
 
 			var history = clone(this.history[p]);
 			this.update(history);
+
+			// button animation
+			$("#tool_redo").addClass("execute");
+			if (this.redo_animation_timer) {
+				clearTimeout(this.redo_animation_timer);
+			}
+			this.redo_animation_timer = setTimeout(function() {
+				$("#tool_redo").removeClass("execute");
+			}, 400);
+
+
+			return true;
 		}
 	}
 
@@ -1959,6 +1985,12 @@
 		new DropperPen($("#tool_dpen"), $(".canvas_wrapper"), cursor_list);
 		new FillPen($("#tool_fill"), $(".canvas_wrapper"), cursor_list);
 		new Selector($("#tool_selector"), $(".canvas_wrapper"), cursor_list);
+		$("#tool_undo").on("click", function() {
+			historyManager.undo();
+		});
+		$("#tool_redo").on("click", function() {
+			historyManager.redo();
+		});
 
 		// shortcut key
 		var shortcutKeyManager = new ShortcutKeyManager();
@@ -1983,7 +2015,7 @@
 				$("#tool_fill").prop("checked", true).change();
 			}
 		).addShortcutKey( // Select
-			{ code: 82 }, // r
+			{ code: 86 }, // v
 			function() {
 				$("#tool_selector").prop("checked", true).change();
 			}

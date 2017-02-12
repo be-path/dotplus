@@ -125,24 +125,81 @@
 				<div class="tools_wrapper">
 					<ul class="tools">
 						<li>
-							<input id="tool_pen" name="tools" type="radio" checked/>
-							<label for="tool_pen"><i class="icon-pencil"></i></label>
-						</li>
-						<li>
-							<input id="tool_eraser" name="tools" type="radio" />
-							<label for="tool_eraser"><i class="icon-eraser"></i></label>
+							<input id="tool_fill" name="tools" type="radio" />
+							<label for="tool_fill" key="A">
+								<div class="tool_icon_container">
+									<div class="tool_icon">
+										<i class="icon-bucket"></i>
+									</div>
+								</div>
+							</label>
 						</li>
 						<li>
 							<input id="tool_dpen" name="tools" type="radio" />
-							<label for="tool_dpen"><i class="fa fa-eyedropper"></i></label>
+							<label for="tool_dpen" key="S">
+								<div class="tool_icon_container">
+									<div class="tool_icon">
+										<i class="fa fa-eyedropper"></i>
+									</div>
+								</div>
+							</label>
 						</li>
 						<li>
-							<input id="tool_fill" name="tools" type="radio" />
-							<label for="tool_fill"><i class="icon-bucket"></i></label>
+							<input id="tool_eraser" name="tools" type="radio" />
+							<label for="tool_eraser" key="D">
+								<div class="tool_icon_container">
+									<div class="tool_icon">
+										<i class="icon-eraser"></i>
+									</div>
+								</div>
+							</label>
+						</li>
+						<li>
+							<input id="tool_pen" name="tools" type="radio" checked/>
+							<label for="tool_pen" key="F">
+								<div class="tool_icon_container">
+									<div class="tool_icon">
+										<i class="icon-pencil"></i>
+									</div>
+								</div>
+							</label>
+						</li>
+
+						<li>
+							<label id="tool_undo" key="Z">
+								<div class="tool_icon_container">
+									<div class="tool_icon">
+										<i class="fa fa-undo"></i>
+									</div>
+								</div>
+							</label>
+						</li>
+						<li>
+							<label id="tool_redo" key="X">
+								<div class="tool_icon_container">
+									<div class="tool_icon">
+										<i class="fa fa-repeat"></i>
+									</div>
+								</div>
+							</label>
+						</li>
+						<li class="dummy">
+							<label>
+								<div class="tool_icon_container">
+									<div class="tool_icon">
+									</div>
+								</div>
+							</label>
 						</li>
 						<li>
 							<input id="tool_selector" name="tools" type="radio" />
-							<label for="tool_selector"><i class="icon-copy"></i></label>
+							<label for="tool_selector" key="V">
+								<div class="tool_icon_container">
+									<div class="tool_icon">
+										<i class="icon-copy"></i>
+									</div>
+								</div>
+							</label>
 						</li>
 					</ul>
 				</div>
