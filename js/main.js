@@ -1546,7 +1546,7 @@
 	class Selector extends Tool {
 		constructor(button, canvas_wrapper, cursor_list) {
 			super(button, canvas_wrapper, cursor_list);
-			this.mode = "";
+			this.mode = ""; // "" -> "select" -> "ready" <-> "moving"
 			this.beginPos = undefined;
 			this.endPos = undefined;
 			this.clipRect = undefined;
@@ -1562,7 +1562,7 @@
 				self.cursorNormal.hide();
 			}, function(evt) {
 				evt.stopPropagation();
-				if (self.getMode() != "select") {
+				if (self.getMode() && self.getMode() != "select") {
 					var offset = {
 						x: Math.min(self.beginPos.x, self.endPos.x),
 						y: Math.min(self.beginPos.y, self.endPos.y)
@@ -1844,7 +1844,6 @@
 		}
 
 		cancelSelect() {
-			var mode = this.getMode();
 			this.beginPos = undefined;
 			this.endPos = undefined;
 			this.setMode("");
@@ -1995,12 +1994,14 @@
 		new Eraser($("#tool_eraser"), $(".canvas_wrapper"), cursor_list);
 		new DropperPen($("#tool_dpen"), $(".canvas_wrapper"), cursor_list);
 		new FillPen($("#tool_fill"), $(".canvas_wrapper"), cursor_list);
-		new Selector($("#tool_selector"), $(".canvas_wrapper"), cursor_list);
+		var tool_selector = new Selector($("#tool_selector"), $(".canvas_wrapper"), cursor_list);
 		$("#tool_undo").on("click", function() {
 			historyManager.undo();
+			tool_selector.cancelSelect();
 		});
 		$("#tool_redo").on("click", function() {
 			historyManager.redo();
+			tool_selector.cancelSelect();
 		});
 
 		// shortcut key
@@ -2038,6 +2039,7 @@
 			],
 			function() {
 				historyManager.undo();
+				tool_selector.cancelSelect();
 			}
 		).addShortcutKeys( // Redo
 			[
@@ -2047,6 +2049,7 @@
 			],
 			function() {
 				historyManager.redo();
+				tool_selector.cancelSelect();
 			}
 		);
 
