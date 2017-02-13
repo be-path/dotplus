@@ -330,7 +330,7 @@
 		return (
 			[
 				zeroPadding(now.getFullYear(), 4), "-",
-				zeroPadding(now.getMonth(), 2), "-",
+				zeroPadding(now.getMonth()+1, 2), "-",
 				zeroPadding(now.getDate(), 2), " ",
 				zeroPadding(now.getHours(), 2), ":",
 				zeroPadding(now.getMinutes(), 2), ":",
