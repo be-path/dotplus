@@ -918,7 +918,10 @@
 		dot(x, y) {
 			var pos = get1DPos(x, y);
 			var index = this.colorManager.getActiveColorIndex();
-			if (index < 0) return;
+			if (index < 0) return false;
+
+			var color = this.colorManager.getActiveColor();
+			if (!color) return false;
 
 			if (this.mask[pos] && (this.pixels[pos] == index)) {
 				return false;
@@ -948,6 +951,9 @@
 			var source_mask = this.mask[p] ? true : false;
 			var queue = [{x: x, y: y}];
 			var fill_index = this.colorManager.getActiveColorIndex();
+			var color = this.colorManager.getActiveColor();
+			if (!color) return false;
+
 			var ds = [
 				{x:  0, y:  1},
 				{x:  0, y: -1},
@@ -1019,6 +1025,7 @@
 
 					if ((pos_dst >= env.canvasWidth*env.canvasHeight) || (pos_dst < 0)) continue;
 					if ((pos_src >= rect.width*rect.height) || (pos_src < 0)) continue;
+					if (!this.colorManager.getColor(pixels[pos_src])) continue;
 
 					if (mask[pos_src]) {
 						if (!this.mask[pos_dst] || (this.pixels[pos_dst] != pixels[pos_src])) result = true;
