@@ -1061,6 +1061,9 @@
 		render(noguide) {
 			var color, color_str, color_index;
 			var screen_rect;
+
+			this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
+
 			var ctx = this.context_back;
 			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 			for (var j = 0; j < env.canvasHeight; j++) {
