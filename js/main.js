@@ -893,6 +893,11 @@
 			this.pixels = [];
 			this.mask = [];
 
+			var  canvas_back = $("<canvas></canvas>");
+			canvas_back.attr("width", env.screenWidth);
+			canvas_back.attr("height", env.screenHeight);
+			this.context_back = canvas_back[0].getContext("2d");
+
 			$(context.canvas).attr("width", env.screenWidth);
 			$(context.canvas).attr("height", env.screenHeight);
 
@@ -906,6 +911,8 @@
 					resize_timer = undefined;
 				}
 				resize_timer = setTimeout(function() {
+					canvas_back.attr("width", env.screenWidth);
+					canvas_back.attr("height", env.screenHeight);
 					$(context.canvas).attr("width", env.screenWidth);
 					$(context.canvas).attr("height", env.screenHeight);
 					self.render();
@@ -1051,7 +1058,7 @@
 		render(noguide) {
 			var color, color_str, color_index;
 			var screen_rect;
-			var ctx = this.context;
+			var ctx = this.context_back;
 			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 			for (var j = 0; j < env.canvasHeight; j++) {
 				for (var i = 0; i < env.canvasWidth; i++) {
@@ -1109,6 +1116,13 @@
 					}
 				}
 			}
+			var src_width = env.screenWidth;
+			var src_height = env.screenHeight;
+			var dst_width = env.screenWidth;
+			var dst_height = env.screenHeight;
+
+			var image = ctx.getImageData(0, 0, src_width, src_height);
+			this.context.drawImage(ctx.canvas, 0, 0, src_width, src_height, 0, 0, dst_width, dst_height);
 		}
 
 		getContiguousPixelNum(x, y) {
@@ -1667,7 +1681,7 @@
 			this.selectCanvas.attr("width", rect.w);
 			this.selectCanvas.attr("height", rect.h);
 
-			var ctx_src = canvasControllers[0].context;
+			var ctx_src = canvasControllers[0].context_back;
 			var ctx_dst = this.selectCanvasContext;
 
 			var image = ctx_src.getImageData(rect.x, rect.y, rect.w, rect.h);
@@ -2151,9 +2165,9 @@
 
 			canvasControllers[0].render(true);
 
-			var canvas_src = canvasControllers[0].context.canvas;
 			var context_dst = canvas_dst.getContext("2d");
-			var context_src = canvasControllers[0].context;
+			var context_src = canvasControllers[0].context_back;
+			var canvas_src = context_src.canvas;
 
 			var image = context_src.getImageData(0, 0, src_width, src_height);
 			//context_dst.putImageData(image, 0, 0);
