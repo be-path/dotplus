@@ -192,6 +192,9 @@
 		if (!loaded_canvas || loaded_canvas.length < 1 || canvasControllers.length < 1) return;
 		canvasControllers[0].pixels = loaded_canvas[0].pixels;
 		canvasControllers[0].mask = loaded_canvas[0].mask;
+
+		var ctx = $("#canvas_main")[0].getContext("2d");
+		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 		canvasControllers[0].render();
 
 		// palette
