@@ -2179,11 +2179,14 @@
 			//context_dst.putImageData(image, 0, 0);
 			context_dst.drawImage(canvas_src, 0, 0, src_width, src_height, 0, 0, dst_width, dst_height);
 
-			canvas_dst.toBlob(function(blob) {
-				var url = window.URL.createObjectURL(blob);
-				$("#download_image img").attr("src", url);
-				$("#download_image").attr("href", url);
-			}, "image/png");
+			var dataurl = canvas_dst.toDataURL("image/png");
+			// window.open(dataurl, "_blank");
+			$("#download_image").attr("src", dataurl);
+
+			// canvas_dst.toBlob(function(blob) {
+			// 	var url = window.URL.createObjectURL(blob);
+			// 	$("#download_image").attr("src", url);
+			// }, "image/png");
 
 			canvasControllers[0].render();
 			return false;
@@ -2194,6 +2197,6 @@
 
 	// disable contextmenu
 	$(document).on("contextmenu", function(evt) {
-		evt.preventDefault();
+		// evt.preventDefault();
 	});
 })();

@@ -560,10 +560,6 @@ button.button_cancel:hover {
 	width: 2.5rem;
 }
 #download_image {
-	display: block;
-	width: 100%;
-}
-#download_image img {
 	width: 100%;
 }
 
