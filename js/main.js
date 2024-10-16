@@ -1129,6 +1129,12 @@
 
 			var image = ctx.getImageData(0, 0, src_width, src_height);
 			this.context.drawImage(ctx.canvas, 0, 0, src_width, src_height, 0, 0, dst_width, dst_height);
+			this.renderPreview();
+		}
+
+		renderPreview() {
+			var image = this.context_back.canvas.toDataURL("image/png");
+			$("#preview_image").attr("src", image);
 		}
 
 		getContiguousPixelNum(x, y) {
@@ -1612,12 +1618,14 @@
 			});
 
 			$("body").on("click", function(evt) {
-				var path = evt.originalEvent.path;
+				var path = evt.originalEvent.composedPath();
 				var flag_do_cancel = true;
-				for (var i = path.length; i--; ) {
-					if (path[i] == self.canvasWrapper[0]) {
-						flag_do_cancel = false;
-						break;
+				if (path) {
+					for (var i = path.length; i--; ) {
+						if (path[i] == self.canvasWrapper[0]) {
+							flag_do_cancel = false;
+							break;
+						}
 					}
 				}
 				if (!flag_do_cancel) return;
@@ -2176,17 +2184,17 @@
 			var canvas_src = context_src.canvas;
 
 			var image = context_src.getImageData(0, 0, src_width, src_height);
-			//context_dst.putImageData(image, 0, 0);
 			context_dst.drawImage(canvas_src, 0, 0, src_width, src_height, 0, 0, dst_width, dst_height);
 
 			var dataurl = canvas_dst.toDataURL("image/png");
-			// window.open(dataurl, "_blank");
 			$("#download_image").attr("src", dataurl);
 
-			// canvas_dst.toBlob(function(blob) {
-			// 	var url = window.URL.createObjectURL(blob);
-			// 	$("#download_image").attr("src", url);
-			// }, "image/png");
+			const a = document.createElement("a");
+			a.href = dataurl;
+			a.download = $("#main_filename").val() + ".png";
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
 
 			canvasControllers[0].render();
 			return false;
