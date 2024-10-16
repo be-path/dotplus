@@ -387,6 +387,7 @@ button.button_cancel:hover {
 }
 #preview_image {
 	width: 100%;
+	aspect-ratio: 1;
 }
 
 .main_filename_wrapper {
